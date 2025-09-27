@@ -10,4 +10,5 @@ class UserBase(SmartCityBqBaseModel):
     identification: str | None = Field(index=True)
 
 class DbUser(UserBase, table=True):
+    __tablename__ = "users"
     password: str | None = Field()

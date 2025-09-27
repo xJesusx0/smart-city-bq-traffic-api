@@ -21,5 +21,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 def get_user_repository(session: SessionDep) -> UserRepository:
     return UserRepositoryImpl(session=session)
 
+def get_user_repository_dep() -> Annotated[UserRepository, Depends(get_user_repository)]:
+    return Depends(get_user_repository)
 
 UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
