@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from src.app.auth.models.token import Token
 from src.app.auth.services.auth_service import AuthService
 from src.app.core.models.user import UserBase
-from src.app.core.jwt_service import create_access_token, get_current_active_user
+from src.app.core.security.jwt_service import create_access_token, get_current_active_user
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 auth_service = AuthService()
