@@ -7,9 +7,9 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
-from src.app.auth.services.auth_service import AuthService
-from src.app.auth.models.user import User
-from src.app.core.jwt_service import create_access_token, get_current_active_user
+from app.auth.services.auth_service import AuthService
+from app.auth.models.user import User
+from app.core.jwt_service import create_access_token, get_current_active_user
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 auth_service = AuthService()

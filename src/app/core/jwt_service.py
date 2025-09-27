@@ -8,10 +8,10 @@ from fastapi import HTTPException, status
 from jwt import InvalidTokenError
 
 
-from src.app.auth.models.user import User
-from src.app.auth.services.auth_service import AuthService
-from src.app.core.settings import settings
-from src.app.core.security import oauth2_scheme
+from app.auth.models.user import User
+from app.auth.services.auth_service import AuthService
+from app.core.settings import settings
+from app.core.security import oauth2_scheme
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm

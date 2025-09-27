@@ -1,5 +1,5 @@
-from src.app.auth.models.user import User
-from src.app.core.encryption_service import verify, encrypt
+from app.auth.models.user import User
+from app.core.encryption_service import verify, encrypt
 
 
 class AuthService:
