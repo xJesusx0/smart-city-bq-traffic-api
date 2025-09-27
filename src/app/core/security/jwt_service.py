@@ -11,7 +11,7 @@ from jwt import InvalidTokenError
 from src.app.core.models.user import UserBase
 from src.app.auth.services.auth_service import AuthService
 from src.app.core.settings import settings
-from src.app.core.security import oauth2_scheme
+from src.app.core.security.security import oauth2_scheme
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm

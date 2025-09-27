@@ -10,5 +10,17 @@ dependencies = [
     "fastapi[standard]>=0.117.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
+    "pymysql>=1.1.2",
+    "pyrefly>=0.34.0",
     "sqlmodel>=0.0.25",
+]
+
+[tool]
+
+[tool.pyrefly]
+project-includes = ["**/*"]
+project-excludes = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/*venv/**/*",
 ]

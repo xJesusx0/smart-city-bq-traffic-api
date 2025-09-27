@@ -8,15 +8,22 @@ from starlette.responses import JSONResponse
 
 from src.app.auth.models.token import Token
 from src.app.auth.services.auth_service import AuthService
+from src.app.core.database.connection import UserRepoDep
 from src.app.core.models.user import UserBase
 from src.app.core.security.jwt_service import create_access_token, get_current_active_user
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
-auth_service = AuthService()
+
+
+def get_auth_service(user_repository: UserRepoDep) -> AuthService:
+    return AuthService(user_repository=user_repository)
+
+
+AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+
 
 @auth_router.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_service: AuthServiceDep) -> Token:
     if form_data.username is None or form_data.password is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,6 +47,3 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
 @auth_router.get("/me")
 def me(current_user: Annotated[UserBase, Depends(get_current_active_user)]) -> JSONResponse:
     return JSONResponse(content={"username": current_user.login_name, "email": current_user.login_name})
-
-
-
