@@ -1,4 +1,3 @@
-from app.main import app
 from app.core.settings import settings
 
 def run() -> None:
