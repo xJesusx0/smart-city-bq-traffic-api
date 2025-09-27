@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 
 from src.app.auth.services.auth_service import AuthService
 from src.app.auth.models.user import User
-from src.app.core.security import get_current_active_user, build_token
+from src.app.core.jwt_service import create_access_token, get_current_active_user
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 auth_service = AuthService()
@@ -24,7 +24,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> JSONRes
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = auth_service.find_by_username(form_data.username)
+    user = auth_service.authenticate_user(form_data.username, form_data.password)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -32,7 +32,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> JSONRes
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token = build_token(user)
+    token = create_access_token(data={"sub": user.username})
 
     return JSONResponse(content={"access_token": token, "token_type": "bearer"})
 
