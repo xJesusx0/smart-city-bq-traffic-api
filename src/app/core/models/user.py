@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from pydantic import BaseModel
 
-from src.app.core.models.base import SmartCityBqBaseModel
+from app.core.models.base import SmartCityBqBaseModel
 
 
 class UserBase(SmartCityBqBaseModel):

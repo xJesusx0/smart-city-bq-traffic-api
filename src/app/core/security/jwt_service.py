@@ -6,10 +6,12 @@ from fastapi import HTTPException, status
 from fastapi.params import Depends
 from jwt import InvalidTokenError
 
-from src.app.core.database.connection import UserRepoDep
-from src.app.core.models.user import DbUser
-from src.app.core.security.security import oauth2_scheme
-from src.app.core.settings import settings
+
+from app.core.models.user import DbUser, UserBase
+from app.auth.services.auth_service import AuthService
+from app.core.settings import settings
+from app.core.security.security import oauth2_scheme
+from app.core.database.connection import UserRepoDep
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -40,7 +42,7 @@ def __get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_repos
 
 
 def get_current_active_user(current_user: Annotated[DbUser, Depends(__get_current_user)]) -> DbUser:
-    if not current_user.is_active:
+    if not current_user.active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 

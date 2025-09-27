@@ -1,6 +1,6 @@
-from src.app.core.models.user import UserBase, DbUser
-from src.app.core.repositories.user_repository import UserRepository
-from src.app.core.security.encryption_service import verify
+from app.core.models.user import UserBase, DbUser
+from app.core.repositories.user_repository import UserRepository
+from app.core.security.encryption_service import verify
 
 
 class AuthService:

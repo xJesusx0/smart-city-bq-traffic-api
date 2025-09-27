@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
-from src.app.core.repositories.user_repository import UserRepository
-from src.app.core.models.user import DbUser
+from app.core.repositories.user_repository import UserRepository
+from app.core.models.user import DbUser
 
 class UserRepositoryImpl(UserRepository):
 
