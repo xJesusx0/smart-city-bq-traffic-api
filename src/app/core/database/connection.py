@@ -1,3 +1,4 @@
+from app.core.settings import settings
 from typing import Generator
 from typing import Annotated
 
@@ -5,7 +6,7 @@ from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlmodel import Session
 
-engine = create_engine("mysql+pymysql://root:081880@localhost:3306/smart_city_bq")
+engine = create_engine(settings.db_url)
 
 
 def get_session() -> Generator[Session, None, None]:
