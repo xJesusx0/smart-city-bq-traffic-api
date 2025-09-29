@@ -4,11 +4,11 @@ from fastapi import HTTPException, status
 from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from starlette.responses import JSONResponse
 
 from app.auth.models.token import Token
 from app.core.security.jwt_service import create_access_token
 from app.core.dependencies import AuthServiceDep, CurrentUserDep
+from app.core.models.user import UserBase
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -39,7 +39,5 @@ def login(
 
 
 @auth_router.get("/me")
-def me(current_user: CurrentUserDep) -> JSONResponse:
-    return JSONResponse(
-        content={"username": current_user.login_name, "email": current_user.login_name}
-    )
+def me(current_user: CurrentUserDep) -> UserBase:
+    return current_user
