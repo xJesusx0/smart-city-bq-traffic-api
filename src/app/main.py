@@ -8,8 +8,3 @@ app = FastAPI()
 
 app.include_router(router)
 app.include_router(auth_router)
-
-
-@router.get("/")
-async def root():
-    return {"mensaje": "Hola mundo"}

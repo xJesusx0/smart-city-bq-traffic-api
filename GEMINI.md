@@ -1,74 +1,98 @@
-# Gemini Context: Smart City Traffic API
+# Contexto del Proyecto: Traffic API (Smart City)
 
-This document provides an overview of the Smart City Traffic API project, a FastAPI-based application designed to serve as a backend for traffic management.
+## 1. Resumen del Proyecto
 
-## 1. Project Overview
+**Traffic API** es el componente de backend para un sistema de gestión de semáforos inteligentes. Su finalidad es centralizar la autenticación, autorización y orquestación de operaciones relacionadas con el control del tráfico urbano en tiempo real.
 
-The project is a Python-based API built with the FastAPI framework. Its primary purpose is to provide a secure interface for traffic-related data and operations. The core functionality currently implemented is a robust authentication system using JSON Web Tokens (JWT).
+- **Objetivos:**
+  - Proveer una API segura y escalable para la gestión de usuarios y sistemas (semáforos, sensores).
+  - Servir como punto de entrada para la recolección de datos de tráfico.
+  - Exponer endpoints para el control y monitoreo remoto de la infraestructura de semáforos.
 
-The application is structured to be modular and scalable, with a clear separation of concerns between routing, business logic (services), data models, and core functionalities like configuration and security.
+- **Alcance Actual:** El proyecto se encuentra en su fase inicial, con el módulo de autenticación y autorización (Auth) como principal funcionalidad implementada. El almacén de usuarios es estático y está definido en el código para fines de demostración.
 
-## 2. Key Technologies
+---
 
-- **Framework:** FastAPI
-- **Web Server:** Uvicorn
-- **Authentication:** JWT (pyjwt), OAuth2 Password Flow
-- **Password Hashing:** bcrypt
-- **Configuration:** pydantic-settings, python-dotenv
-- **Data Validation:** Pydantic
+## 2. Arquitectura General
 
-## 3. Project Structure
+Aunque el estado actual es un monolito, la **arquitectura objetivo** se basa en un enfoque de microservicios para garantizar la escalabilidad y resiliencia del sistema.
 
-The source code is located in the `src/` directory and follows a logical organization:
+- **Microservicios Propuestos:**
+  - **Auth Service (Actual):** Gestiona la identidad, autenticación (JWT) y permisos de usuarios y otros servicios.
+  - **Traffic Control Service:** Lógica de negocio para el control de los semáforos (cambios de estado, planes de tiempo, modo emergencia).
+  - **Data Ingestion Service:** Recolecta y procesa datos de sensores de tráfico, cámaras, etc.
+  - **Monitoring Service:** Provee datos sobre el estado y rendimiento de la infraestructura.
+
+- **Base de Datos:** No implementada aún. Se recomienda **PostgreSQL** con **PostGIS** para datos relacionales y geoespaciales, y una base de datos de series temporales como **TimescaleDB** o **InfluxDB** para métricas de tráfico.
+
+- **Frontend:** Una aplicación web (no desarrollada) que consumiría esta API para visualizar el estado del tráfico, gestionar la configuración y generar reportes.
+
+- **Flujo de Datos (Objetivo):**
+  1. Un usuario (operador) o un sistema se autentica contra el **Auth Service** y obtiene un JWT.
+  2. Con el JWT, el cliente realiza peticiones a los microservicios correspondientes (ej. cambiar el estado de un semáforo a través del **Traffic Control Service**).
+  3. Los servicios se comunican entre sí de forma asíncrona mediante un **Message Broker** (ej. RabbitMQ) para notificar eventos importantes (ej. alta densidad de tráfico).
+
+---
+
+## 3. Dependencias y Entorno
+
+- **Lenguaje:** Python 3.13
+- **Framework Principal:** FastAPI
+- **Servidor ASGI:** Uvicorn
+- **Autenticación y Seguridad:**
+  - `python-jose` y `pyjwt`: Para la creación y validación de JSON Web Tokens (JWT).
+  - `bcrypt`: Para el hashing de contraseñas. Se puede considerar migrar a `passlib` para mayor flexibilidad de algoritmos.
+  - `OAuth2PasswordBearer`: Implementación del flujo de obtención de tokens.
+- **Configuración:** `pydantic-settings` para gestionar variables de entorno (fichero `.env`).
+- **Gestor de Paquetes y Entorno:** `uv`.
+
+---
+
+## 4. Estructura de Carpetas
+
+El proyecto sigue una estructura modular y limpia para facilitar el mantenimiento.
 
 ```
 src/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py             # FastAPI app instantiation and main router setup.
-│   ├── auth/               # Authentication module.
-│   │   ├── models/         # Pydantic models for User and Token.
-│   │   ├── routes/         # API endpoints for authentication (/login, /me).
-│   │   └── services/       # Business logic for user authentication.
-│   └── core/               # Core application components.
-│       ├── encryption_service.py # Handles password hashing and verification.
-│       ├── jwt_service.py    # Manages JWT creation and decoding.
-│       └── settings.py       # Manages application configuration.
-└── run.py                  # Application entry point for running with Uvicorn.
+│   ├── main.py             # Instancia de FastAPI y routers principales.
+│   ├── auth/               # Módulo de autenticación.
+│   │   ├── models/         # Modelos Pydantic (User, Token).
+│   │   ├── routes/         # Endpoints (/login, /me).
+│   │   └── services/       # Lógica de negocio (autenticación de usuario).
+│   └── core/               # Componentes transversales.
+│       ├── encryption_service.py # Hashing y verificación de contraseñas.
+│       ├── jwt_service.py    # Creación y decodificación de JWTs.
+│       ├── security.py       # Esquema de seguridad OAuth2.
+│       └── settings.py       # Configuración de la aplicación.
+└── run.py                  # Punto de entrada para ejecutar la app con Uvicorn.
 ```
 
-## 4. Core Functionality
+---
 
-### 4.1. Application Startup
+## 5. Flujo de Ejecución
 
-- The application is launched via `src/run.py`.
-- This script imports the main FastAPI `app` instance from `src/app/main.py` and the configuration from `src/app/core/settings.py`.
-- It uses `uvicorn` to run the application, with settings like host, port, and reload-on-change determined by environment variables.
+1.  **Inicio de la Aplicación:**
+    - La aplicación se inicia ejecutando `python src/run.py`.
+    - `run.py` utiliza `uvicorn` para levantar el servidor ASGI, cargando la instancia de `FastAPI` definida en `app/main.py`.
+    - La configuración (host, puerto, modo debug) se carga desde `app/core/settings.py`.
 
-### 4.2. Configuration
+2.  **Endpoints Principales:**
+    - `POST /api/auth/login`:
+      - Recibe `username` y `password` en un formulario.
+      - `AuthService` valida las credenciales contra el usuario estático.
+      - Si son válidas, `JwtService` genera un `access_token` y lo devuelve.
+    - `GET /api/auth/me`:
+      - Endpoint protegido que requiere un `Authorization: Bearer <token>`.
+      - El `token` es validado por la dependencia `get_current_active_user`.
+      - Devuelve la información del usuario autenticado.
 
-- The `core/settings.py` file uses `pydantic-settings` to load configuration from environment variables (`.env` file).
-- Key settings include application host/port, environment (`development`/`production`), and JWT parameters (secret key, algorithm, expiration time).
+---
 
-### 4.3. Authentication Flow
+## 6. Notas Importantes
 
-The API implements OAuth2 "Password Flow" for authentication.
-
-1.  **Login (`/api/auth/login`):**
-    - The user submits their `username` and `password` to this endpoint.
-    - The `auth/routes/auth.py` router receives the request.
-    - It calls `AuthService.authenticate_user` to validate the credentials.
-    - `AuthService` retrieves the user (currently, a hardcoded user "jesus" for demonstration) and uses `encryption_service.verify` to check the password against the stored bcrypt hash.
-    - If authentication is successful, `jwt_service.create_access_token` generates a JWT containing the user's identifier (`sub`) and an expiration date.
-    - The JWT is returned to the client.
-
-2.  **Accessing Protected Routes (e.g., `/api/auth/me`):**
-    - The client must include the JWT in the `Authorization` header as a "Bearer" token.
-    - FastAPI's dependency injection system uses the `get_current_active_user` function from `jwt_service.py`.
-    - This function decodes the token, validates its signature and expiration, and retrieves the corresponding user from `AuthService`.
-    - If the token is valid and the user is active, the user object is injected into the route handler, and the request is processed. Otherwise, a 401 Unauthorized error is returned.
-
-### 4.4. Security
-
-- **Password Storage:** Passwords are not stored in plaintext. The `encryption_service.py` uses `bcrypt` to create a strong, salted hash of the user's password.
-- **Token-Based Security:** JWTs are used to secure endpoints, ensuring that only authenticated users can access protected resources.
+- **Limitación de `bcrypt`:** El algoritmo `bcrypt` tiene una limitación intrínseca: solo procesa los primeros 72 bytes de una contraseña. Cualquier carácter más allá de ese límite es ignorado silenciosamente. Es crucial asegurar que las políticas de contraseñas no excedan este límite o considerar otros algoritmos si se requieren contraseñas más largas.
+- **Usuario Estático:** Actualmente, el `AuthService` utiliza un usuario hardcodeado (`find_by_username`). El siguiente paso es conectar el servicio a una base de datos real de usuarios.
+- **Gestión de Dependencias:** Se recomienda utilizar un contenedor de inyección de dependencias (ej. `dependency-injector`) a medida que el proyecto crezca para gestionar la creación de instancias de servicios y repositorios de forma centralizada.
+- **Despliegue:** Para producción, no se debe usar el modo `reload` de Uvicorn. Se recomienda ejecutar Uvicorn detrás de un servidor proxy inverso como Nginx y usar un gestor de procesos como Gunicorn para manejar los workers de Uvicorn.
