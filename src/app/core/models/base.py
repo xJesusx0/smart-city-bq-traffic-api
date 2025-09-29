@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from sqlmodel import SQLModel, Field
@@ -5,6 +6,6 @@ from sqlmodel import SQLModel, Field
 
 class SmartCityBqBaseModel(SQLModel):
     id: Optional[int] = Field(default=None, primary_key=True)
-    active: bool | None = Field(default=True)
-    creation_date: str | None = Field()
-    update_date: str | None = Field()
+    active: bool = Field(default=True)
+    creation_date: datetime = Field()
+    update_date: Optional[datetime] = Field()

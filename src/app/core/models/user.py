@@ -4,11 +4,11 @@ from app.core.models.base import SmartCityBqBaseModel
 
 
 class UserBase(SmartCityBqBaseModel):
-    login_name: str | None = Field(index=True)
-    name: str | None = Field()
-    identification: str | None = Field(index=True)
+    login_name: str = Field(index=True)
+    name: str = Field()
+    identification: str = Field(index=True)
 
 
 class DbUser(UserBase, table=True):
     __tablename__ = "users"
-    password: str | None = Field()
+    password: str = Field()
