@@ -42,7 +42,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_servi
 
     token = create_access_token(data={"sub": user.login_name})
 
-    return Token(access_token=token, token_type="bearer").model_dump()
+    return Token(access_token=token, token_type="bearer")
 
 
 @auth_router.get("/me")
