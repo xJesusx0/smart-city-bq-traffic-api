@@ -9,19 +9,9 @@ from app.core.repositories.user_repository import UserRepository
 
 engine = create_engine("mysql+pymysql://root:081880@localhost:3306/smart_city_bq")
 
-
 def get_session():
     with Session(engine) as session:
         yield session
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
-
-
-def get_user_repository(session: SessionDep) -> UserRepository:
-    return UserRepositoryImpl(session=session)
-
-def get_user_repository_dep() -> Annotated[UserRepository, Depends(get_user_repository)]:
-    return Depends(get_user_repository)
-
-UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]

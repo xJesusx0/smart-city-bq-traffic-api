@@ -8,20 +8,12 @@ from starlette.responses import JSONResponse
 
 from app.auth.models.token import Token
 from app.auth.services.auth_service import AuthService
-from app.core.database.connection import get_user_repository
 from app.core.models.user import UserBase
 from app.core.repositories.user_repository import UserRepository
-from app.core.security.jwt_service import create_access_token, get_current_active_user
+from app.core.security.jwt_service import create_access_token
+from app.core.dependencies import AuthServiceDep, CurrentUserDep
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
-
-
-def get_auth_service(user_repository: Annotated[UserRepository, Depends(get_user_repository)]) -> AuthService:
-    return AuthService(user_repository=user_repository)
-
-
-AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
-
 
 @auth_router.post("/login")
 def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_service: AuthServiceDep) -> Token:
@@ -46,5 +38,5 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_servi
 
 
 @auth_router.get("/me")
-def me(current_user: Annotated[UserBase, Depends(get_current_active_user)]) -> JSONResponse:
+def me(current_user: CurrentUserDep) -> JSONResponse:
     return JSONResponse(content={"username": current_user.login_name, "email": current_user.login_name})
