@@ -3,8 +3,8 @@ from sqlmodel import Session, select
 from app.core.repositories.user_repository import UserRepository
 from app.core.models.user import DbUser
 
-class UserRepositoryImpl(UserRepository):
 
+class UserRepositoryImpl(UserRepository):
     def __init__(self, session: Session):
         self.session = session
 
