@@ -1,5 +1,6 @@
 from app.core.settings import settings
 
+
 def run() -> None:
     import uvicorn
 

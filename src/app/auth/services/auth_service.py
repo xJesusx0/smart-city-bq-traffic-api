@@ -1,4 +1,4 @@
-from app.core.models.user import UserBase, DbUser
+from app.core.models.user import DbUser
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.encryption_service import verify
 
