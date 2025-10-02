@@ -1,3 +1,4 @@
+from app.iam.services.user_service import UserService
 from typing import Annotated
 
 import jwt
@@ -29,13 +30,19 @@ UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 
 
 def get_auth_service(
-    user_repository: Annotated[UserRepository, Depends(get_user_repository)],
+    user_repository: UserRepoDep,
 ) -> AuthService:
     return AuthService(user_repository=user_repository)
 
 
-AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+def get_user_service(
+    user_repository: UserRepoDep,
+) -> UserService:
+    return UserService(user_repository=user_repository)
 
+
+AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 # --- Security
 
 
