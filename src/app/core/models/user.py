@@ -35,4 +35,3 @@ class UserUpdate(SQLModel):
 class DbUser(UserBase, table=True):
     __tablename__ = "users"
     password: str = Field()
-    roles: list["DbRole"] = Relationship(back_populates="users", link_model=DbUserRole)

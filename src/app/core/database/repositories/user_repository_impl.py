@@ -1,5 +1,3 @@
-from sqlalchemy.orm.strategy_options import selectinload
-from app.core.models.user_role import DbUserRole
 from datetime import datetime
 from app.core.models.user import UserCreate, UserUpdate
 from typing import Sequence
