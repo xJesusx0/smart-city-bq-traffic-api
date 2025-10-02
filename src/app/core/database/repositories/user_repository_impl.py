@@ -1,6 +1,7 @@
+from sqlalchemy.orm.strategy_options import selectinload
+from app.core.models.user_role import DbUserRole
 from datetime import datetime
 from app.core.models.user import UserCreate, UserUpdate
-from app.core.models.user_role import UserWithRoles
 from typing import Sequence
 from typing import Optional
 from sqlmodel import Session, select
@@ -36,12 +37,6 @@ class UserRepositoryImpl(UserRepository):
 
     def get_user_by_login_name(self, login_name: str) -> Optional[DbUser]:
         statement = select(DbUser).where(DbUser.login_name == login_name)
-
-        result = self.session.exec(statement).first()
-        return result
-
-    def get_user_with_roles_by_id(self, user_id: int) -> Optional[UserWithRoles]:
-        statement = select(UserWithRoles).where(UserWithRoles.id == user_id)
 
         result = self.session.exec(statement).first()
         return result

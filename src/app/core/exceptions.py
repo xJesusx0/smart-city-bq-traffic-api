@@ -53,3 +53,11 @@ def get_internal_server_error_exception(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         detail=message,
     )
+
+
+def get_credentials_exception() -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )

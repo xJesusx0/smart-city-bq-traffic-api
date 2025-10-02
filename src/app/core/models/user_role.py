@@ -13,9 +13,5 @@ class DbUserRole(UserRoleBase, table=True):
     __tablename__ = "users_roles"
 
 
-class UserWithRoles(DbUser):
-    roles: list["DbRole"] = Relationship(back_populates="users", link_model=DbUserRole)
-
-
 class RoleWithUsers(DbRole):
     users: list["DbUser"] = Relationship(back_populates="roles", link_model=DbUserRole)

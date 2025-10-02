@@ -1,3 +1,7 @@
+from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
+from app.iam.services.module_service import ModuleService
+from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
+from app.core.repositories.module_repository import ModuleRepository
 from app.iam.services.user_service import UserService
 from typing import Annotated
 
@@ -24,25 +28,42 @@ def get_user_repository(session: SessionDep) -> UserRepository:
     return UserRepositoryImpl(session=session)
 
 
-UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
+def get_module_repository(session: SessionDep) -> ModuleRepository:
+    return ModuleRepositoryImpl(session)
 
+
+UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
+ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 # --- Services
 
 
-def get_auth_service(
-    user_repository: UserRepoDep,
-) -> AuthService:
+def get_auth_service(user_repository: UserRepoDep) -> AuthService:
     return AuthService(user_repository=user_repository)
 
 
-def get_user_service(
-    user_repository: UserRepoDep,
-) -> UserService:
+def get_user_service(user_repository: UserRepoDep) -> UserService:
     return UserService(user_repository=user_repository)
+
+
+def get_module_service(module_repository: ModuleRepoDep) -> ModuleService:
+    return ModuleService(module_repository=module_repository)
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
+ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
+
+
+# --- Usecases
+def get_get_user_with_modules_use_case(
+    user_service: UserServiceDep, module_service: ModuleServiceDep
+) -> GetUserWithModulesUseCase:
+    return GetUserWithModulesUseCase(user_service, module_service)
+
+
+GetModulesWithUseCaseDep = Annotated[
+    GetUserWithModulesUseCase, Depends(get_get_user_with_modules_use_case)
+]
 # --- Security
 
 

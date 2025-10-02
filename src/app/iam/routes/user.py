@@ -1,3 +1,6 @@
+from app.core.exceptions import get_credentials_exception
+from app.core.dependencies import GetModulesWithUseCaseDep
+from app.core.dependencies import CurrentUserDep
 from app.core.exceptions import get_internal_server_error_exception
 from app.core.exceptions import get_conflict_exception
 from sqlalchemy.exc import IntegrityError
@@ -5,6 +8,8 @@ from fastapi import status, Response
 
 from app.core.exceptions import get_entity_not_found_exception
 from app.core.models.user import UserBase, UserCreate, UserUpdate
+from app.iam.dtos.user import UserWithModulesDTO
+
 from fastapi.routing import APIRouter
 
 from app.core.dependencies import UserServiceDep
@@ -70,3 +75,20 @@ def delete_user(user_id: int, user_service: UserServiceDep):
         raise get_entity_not_found_exception(f"Usuario con id {user_id} no encontrado")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@user_router.get("/me/modules", response_model=UserWithModulesDTO)
+def get_current_user_modules(
+    current_user: CurrentUserDep,
+    get_user_with_modules_use_case: GetModulesWithUseCaseDep,
+):
+    if current_user.id is None:
+        raise get_credentials_exception()
+
+    try:
+        return get_user_with_modules_use_case.invoke(current_user.id)
+    except Exception as e:
+        logging.error(str(e))
+        raise get_internal_server_error_exception(
+            "Ocurrio un error inesperado al obtener los modulos del usuario actal"
+        )

@@ -1,5 +1,6 @@
+from app.core.models.user_role import DbUserRole
 from typing import Optional
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 from app.core.models.base import SmartCityBqBaseModel
 
@@ -34,3 +35,4 @@ class UserUpdate(SQLModel):
 class DbUser(UserBase, table=True):
     __tablename__ = "users"
     password: str = Field()
+    roles: list["DbRole"] = Relationship(back_populates="users", link_model=DbUserRole)
