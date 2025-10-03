@@ -1,7 +1,26 @@
 [project]
 name = "traffic-api"
-version = "0.1.0"
+version = "0.1.0.dev0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "bcrypt>=5.0.0",
+    "dotenv>=0.9.9",
+    "fastapi[standard]>=0.117.1",
+    "pydantic-settings>=2.11.0",
+    "pyjwt>=2.10.1",
+    "pymysql>=1.1.2",
+    "pyrefly>=0.34.0",
+    "sqlmodel>=0.0.25",
+]
+
+[tool]
+
+[tool.pyrefly]
+project-includes = ["**/*"]
+project-excludes = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/*venv/**/*",
+]
