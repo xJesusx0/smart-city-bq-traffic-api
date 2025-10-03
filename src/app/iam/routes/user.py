@@ -86,7 +86,8 @@ def get_current_user_modules(
         raise get_credentials_exception()
 
     try:
-        return get_user_with_modules_use_case.invoke(current_user.id)
+        return get_user_with_modules_use_case.invoke(current_user)
+
     except Exception as e:
         logging.error(str(e))
         raise get_internal_server_error_exception(

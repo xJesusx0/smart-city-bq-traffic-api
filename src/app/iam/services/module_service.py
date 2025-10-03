@@ -10,4 +10,6 @@ class ModuleService:
         """
         Gets all modules associated with a list of role IDs.
         """
-        return self.module_repository.get_modules_by_role_ids(role_ids)
+        modules = self.module_repository.get_modules_by_role_ids(role_ids)
+        print(modules)
+        return modules

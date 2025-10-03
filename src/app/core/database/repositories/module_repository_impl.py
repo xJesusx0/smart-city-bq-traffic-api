@@ -12,10 +12,17 @@ class ModuleRepositoryImpl(ModuleRepository):
         if not role_ids:
             return []
 
+        modules_roles_statement = select(DbModuleRole).where(
+            DbModuleRole.role_id.in_(role_ids)  # type: ignore
+        )
+
+        modules_roles = self.session.exec(modules_roles_statement)
+        print(modules_roles)
+        modules_ids = [mr.module_id for mr in modules_roles]
+
         statement = (
             select(DbModule)
-            .join(DbModuleRole)
-            .where(DbModuleRole.role_id.in_(role_ids))  # role_ids es una lista de ints
+            .where(DbModule.id.in_(modules_ids))  # type: ignore
             .distinct()
         )
 
