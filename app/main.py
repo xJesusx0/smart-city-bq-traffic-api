@@ -5,6 +5,7 @@ from app.auth.routes.auth import auth_router
 from app.core.settings import settings
 
 import logging
+import uvicorn
 
 router = APIRouter(prefix="/api")
 
@@ -24,3 +25,14 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(auth_router)
 app.include_router(user_router)
+
+
+def start():
+    """Función para iniciar el servidor"""
+    uvicorn.run(
+        "app.main:app", host=settings.app_host, port=settings.app_port, reload=True
+    )
+
+
+if __name__ == "__main__":
+    start()
