@@ -8,10 +8,10 @@ dependencies = [
     "bcrypt>=5.0.0",
     "dotenv>=0.9.9",
     "fastapi[standard]>=0.117.1",
+    "motor>=3.7.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
     "pymysql>=1.1.2",
-    "pyrefly>=0.34.0",
     "sqlmodel>=0.0.25",
 ]
 

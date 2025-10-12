@@ -23,6 +23,10 @@ class Settings(BaseSettings):
 
     allowed_hosts: list[str] = []
 
+    mongodb_url: str = "mongodb://admin:admin123@localhost:27017"
+    mongodb_database: str = "smart_traffic"
+    mongodb_collection: str = "traffic_metrics"
+
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def build_allowed_hosts(cls, value: str | list[str]) -> str | list[str]:
