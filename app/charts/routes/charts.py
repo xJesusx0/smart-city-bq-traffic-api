@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.core.database.mongo.mongo import mongodb
+from app.charts.models.charts import TimeLineResponse, DatasetResponse
 
 charts_router = APIRouter(prefix="/api/charts", tags=["Charts"])
 
@@ -67,18 +68,19 @@ async def get_vehicle_timeline(
             labels.append(label)
             data.append(round(item["avg_vehicles"], 1))
 
-        return {
-            "labels": labels,
-            "datasets": [
-                {
-                    "label": "Vehículos detectados",
-                    "data": data,
-                    "borderColor": "rgb(75, 192, 192)",
-                    "backgroundColor": "rgba(75, 192, 192, 0.2)",
-                    "tension": 0.4,
-                }
+        time_line_response = TimeLineResponse(
+            labels=labels,
+            data=[
+                DatasetResponse(
+                    label="Vehículos detectados",
+                    data=data,
+                    border_color="rgb(75, 192, 192)",
+                    background_color="rgba(75, 192, 192, 0.2)",
+                    tension=0.4,
+                )
             ],
-        }
+        )
+        return time_line_response
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
