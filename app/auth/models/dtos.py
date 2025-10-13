@@ -6,4 +6,5 @@ class UserWithModulesDTO(UserBase):
     """
     Data Transfer Object for a user, including the list of modules they have access to.
     """
+
     modules: list[ModuleBase]

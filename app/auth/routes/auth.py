@@ -1,5 +1,5 @@
 import traceback
-
+import logging
 
 from typing import Annotated
 
@@ -8,11 +8,16 @@ from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 
+from app.auth.models.dtos import UserWithModulesDTO
 from app.auth.models.token import Token
 from app.auth.models.oauth_google import GoogleTokenRequest
 from app.core.security.jwt_service import create_access_token
-from app.core.dependencies import AuthServiceDep, CurrentUserDep, GoogleAuthServiceDep
-from app.core.models.user import UserBase
+from app.core.dependencies import (
+    AuthServiceDep,
+    CurrentUserDep,
+    GoogleAuthServiceDep,
+    GetModulesWithUseCaseDep,
+)
 from app.core.exceptions import (
     get_credentials_exception,
     get_internal_server_error_exception,
@@ -79,5 +84,18 @@ def oauth_google_login(
 
 
 @auth_router.get("/me")
-def me(current_user: CurrentUserDep) -> UserBase:
-    return current_user
+def me(
+    current_user: CurrentUserDep,
+    get_user_with_modules_use_case: GetModulesWithUseCaseDep,
+):
+    if current_user.id is None:
+        raise get_credentials_exception()
+
+    try:
+        return get_user_with_modules_use_case.invoke(current_user)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise get_internal_server_error_exception(
+            "Ocurrio un error inesperado al obtener los modulos del usuario actal"
+        )
