@@ -5,8 +5,6 @@ from app.core.settings import settings
 from app.iam.routes.user import user_router
 from app.charts.routes.charts import charts_router
 
-from app.core.database.mongo.mongo import mongodb
-
 import logging
 import uvicorn
 

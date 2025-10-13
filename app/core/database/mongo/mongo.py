@@ -1,4 +1,3 @@
-from app.core.models.analysis_response import AnalysisResponse
 from app.core.settings import settings
 from app.core.exceptions import get_internal_server_error_exception
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -15,24 +14,29 @@ class MongoDB:
     db: Optional[AsyncIOMotorDatabase] = None
     _connection_lock: Optional[asyncio.Lock] = None
     _is_connected: bool = False
+    _loop_id: Optional[int] = None
 
     def __init__(self):
         self._connection_lock = asyncio.Lock()
 
     async def ensure_connection(self):
-        """
-        Asegurar que la conexión esté establecida
-        Esta función se llama en cada operación para garantizar conexión en Vercel
-        """
+        current_loop_id = id(asyncio.get_event_loop())
+
+        # Si el cliente ya existe pero el loop cambió → reconectar
         if self._is_connected and self.client is not None and self.db is not None:
-            return
+            if self._loop_id == current_loop_id:
+                return
+            else:
+                print("🔁 Nuevo event loop detectado, reconectando MongoDB...")
+                await self.close()
+                self._is_connected = False
+
         self._connection_lock = self._get_lock()
         async with self._connection_lock:
-            # Double-check después de adquirir el lock
             if self._is_connected and self.client is not None and self.db is not None:
                 return
-
             await self._connect()
+            self._loop_id = current_loop_id
 
     def _get_lock(self) -> asyncio.Lock:
         """Obtener o crear el lock de forma lazy"""
