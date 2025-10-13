@@ -18,7 +18,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_user_by_login_name(self, login_name: str) -> Optional[DbUser]:
+    def get_user_by_email(self, email: str) -> Optional[DbUser]:
         pass
 
     @abstractmethod

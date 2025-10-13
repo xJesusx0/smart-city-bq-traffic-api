@@ -113,7 +113,7 @@ def get_current_user(
     except InvalidTokenError:
         raise credentials_exception
 
-    user = user_repository.get_user_by_login_name(username)
+    user = user_repository.get_user_by_email(username)
     if user is None:
         raise credentials_exception
 
