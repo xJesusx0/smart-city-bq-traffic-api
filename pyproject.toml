@@ -8,10 +8,15 @@ dependencies = [
     "bcrypt>=5.0.0",
     "dotenv>=0.9.9",
     "fastapi[standard]>=0.117.1",
+    "google-auth>=2.41.1",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.2",
     "motor>=3.7.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
     "pymysql>=1.1.2",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
     "sqlmodel>=0.0.25",
 ]
 

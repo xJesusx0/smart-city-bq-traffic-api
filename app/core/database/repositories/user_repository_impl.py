@@ -54,6 +54,7 @@ class UserRepositoryImpl(UserRepository):
     def create_user(self, user: UserCreate) -> DbUser:
         db_user = DbUser.model_validate(user)
         db_user.creation_date = datetime.now()
+        db_user.active = True
         self.session.add(db_user)
         self.session.commit()
         self.session.refresh(db_user)

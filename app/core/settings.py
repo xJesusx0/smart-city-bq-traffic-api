@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     mongodb_database: str = "smart_traffic"
     mongodb_collection: str = "traffic_metrics"
 
+    google_client_id: str = ""
+
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def build_allowed_hosts(cls, value: str | list[str]) -> str | list[str]:

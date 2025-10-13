@@ -1,3 +1,6 @@
+import traceback
+
+
 from typing import Annotated
 
 from fastapi import HTTPException, status
@@ -6,9 +9,14 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.models.token import Token
+from app.auth.models.oauth_google import GoogleTokenRequest
 from app.core.security.jwt_service import create_access_token
-from app.core.dependencies import AuthServiceDep, CurrentUserDep
+from app.core.dependencies import AuthServiceDep, CurrentUserDep, GoogleAuthServiceDep
 from app.core.models.user import UserBase
+from app.core.exceptions import (
+    get_credentials_exception,
+    get_internal_server_error_exception,
+)
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -36,6 +44,38 @@ def login(
     token = create_access_token(data={"sub": user.login_name})
 
     return Token(access_token=token, token_type="bearer")
+
+
+@auth_router.post("/login/google")
+def oauth_google_login(
+    token_request: GoogleTokenRequest,
+    auth_service: AuthServiceDep,
+    google_auth_service: GoogleAuthServiceDep,
+) -> Token:
+    try:
+        print("Validando token de Google...")
+        google_user_info = google_auth_service.get_user_info(token_request.token)
+
+        print("Token de Google validado:", google_user_info)
+        if google_user_info is None:
+            raise get_credentials_exception("Token de google inválido")
+
+        user = auth_service.authenticate_google_user(google_user_info)
+
+        if user is None:
+            raise get_credentials_exception("Credenciales de autenticacion invalidas")
+
+        token = create_access_token(data={"sub": user.login_name})
+
+        return Token(access_token=token, token_type="bearer")
+    except ValueError:
+        print(traceback.format_exc())
+        raise get_credentials_exception("No se pudo validar el token de Google")
+    except Exception:
+        print(traceback.format_exc())
+        raise get_internal_server_error_exception(
+            "Ocurrio un error inesperado al validar el token de Google"
+        )
 
 
 @auth_router.get("/me")
