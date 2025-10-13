@@ -31,19 +31,6 @@ app.include_router(user_router)
 app.include_router(charts_router)
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Se ejecuta al iniciar el servidor"""
-    global detector
-    print("🚀 Iniciando Video Analysis Service...")
-    try:
-        print("🔌 Conectando a MongoDB...")
-        await mongodb.connect()
-        print("✅ Conectado a MongoDB")
-    except Exception as e:
-        print(f"⚠️  No se pudo conectar a MongoDB: {e}")
-
-
 def start():
     """Función para iniciar el servidor"""
     uvicorn.run(
