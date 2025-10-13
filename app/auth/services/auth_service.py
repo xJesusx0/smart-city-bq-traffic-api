@@ -1,6 +1,6 @@
 import traceback
 
-from app.core.models.user import DbUser, UserCreate
+from app.core.models.user import DbUser
 from app.auth.models.oauth_google import GoogleUserInfo
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.encryption_service import verify

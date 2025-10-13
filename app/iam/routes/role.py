@@ -9,7 +9,7 @@ from app.core.exceptions import (
     get_conflict_exception,
     get_bad_request_exception,
 )
-from app.core.models.role import RoleBase, RoleCreate, RoleUpdate, DbRole
+from app.core.models.role import RoleCreate, RoleUpdate, DbRole
 
 role_router = APIRouter(prefix="/api/iam/roles", tags=["roles"])
 

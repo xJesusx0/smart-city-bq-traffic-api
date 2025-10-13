@@ -5,7 +5,7 @@ from app.core.exceptions import (
 )
 from app.core.validations import is_valid_email
 from sqlalchemy.exc import IntegrityError
-from fastapi import status, Response, HTTPException
+from fastapi import status, Response
 
 from app.core.exceptions import get_entity_not_found_exception
 from app.core.models.user import UserBase, UserCreate, UserUpdate

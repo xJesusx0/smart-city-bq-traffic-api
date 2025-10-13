@@ -2,7 +2,10 @@ from app.iam.services.user_role_service import UserRoleService
 from app.iam.services.user_service import UserService
 from app.iam.services.role_service import RoleService
 from app.core.models.user import UserUpdate, UserBase
-from app.core.exceptions import get_bad_request_exception, get_entity_not_found_exception
+from app.core.exceptions import (
+    get_bad_request_exception,
+    get_entity_not_found_exception,
+)
 
 
 class UpdateUserUseCase:
@@ -20,7 +23,9 @@ class UpdateUserUseCase:
         # Validate user exists
         user = self.user_service.get_user_by_id(user_id)
         if not user:
-            raise get_entity_not_found_exception(f"Usuario con id {user_id} no encontrado")
+            raise get_entity_not_found_exception(
+                f"Usuario con id {user_id} no encontrado"
+            )
 
         # Validate roles if provided
         if user_to_update.roles is not None:
@@ -33,7 +38,9 @@ class UpdateUserUseCase:
         # Update user
         updated_user = self.user_service.update_user(user_id, user_to_update)
         if not updated_user:
-            raise get_entity_not_found_exception(f"No se pudo actualizar el usuario con id {user_id}")
+            raise get_entity_not_found_exception(
+                f"No se pudo actualizar el usuario con id {user_id}"
+            )
 
         # Sync roles
         if user_to_update.roles is not None:
@@ -42,6 +49,6 @@ class UpdateUserUseCase:
                 self.user_role_service.assign_roles_to_user(
                     user_id, user_to_update.roles
                 )
-        
+
         # Return user with updated data
         return self.user_service.get_user_by_id(user_id)

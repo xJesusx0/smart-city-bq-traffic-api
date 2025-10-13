@@ -17,7 +17,7 @@ from typing import Annotated, Any
 
 import jwt
 import traceback
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService

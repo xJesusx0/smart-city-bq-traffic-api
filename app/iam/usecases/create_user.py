@@ -1,7 +1,7 @@
 from app.iam.services.user_role_service import UserRoleService
 from app.iam.services.user_service import UserService
 from app.iam.services.role_service import RoleService
-from app.core.models.user import UserCreate, DbUser, UserBase
+from app.core.models.user import UserCreate, UserBase
 from app.core.exceptions import get_bad_request_exception
 
 
