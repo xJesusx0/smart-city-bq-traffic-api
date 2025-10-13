@@ -1,7 +1,6 @@
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import jwt
-
 
 from app.core.settings import settings
 

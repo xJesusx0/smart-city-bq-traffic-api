@@ -1,4 +1,5 @@
 from sqlmodel import Field
+
 from app.core.models.base import SmartCityBqBaseModel
 
 

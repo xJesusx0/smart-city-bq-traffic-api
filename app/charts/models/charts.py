@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 # ============================================
 # Modelos Base para Datasets
 # ============================================

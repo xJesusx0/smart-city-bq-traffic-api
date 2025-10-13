@@ -1,37 +1,35 @@
-from app.core.database.repositories.user_role_repository_impl import (
-    UserRoleRepositoryImpl,
-)
-from app.core.repositories.user_role_repository import UserRoleRepository
-from app.iam.services.role_service import RoleService
-from app.core.database.repositories.role_repository_impl import RoleRepositoryImpl
-from app.core.repositories.role_repository import RoleRepository
-from app.iam.services.user_role_service import UserRoleService
-from app.iam.usecases.create_user import CreateUserUseCase
-from app.iam.usecases.update_user import UpdateUserUseCase
-from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
-from app.iam.services.module_service import ModuleService
-from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
-from app.core.repositories.module_repository import ModuleRepository
-from app.iam.services.user_service import UserService
+import traceback
 from typing import Annotated, Any
 
 import jwt
-import traceback
 from fastapi import Depends, HTTPException
 from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService
 from app.auth.services.google_auth_service import GoogleAuthService
 from app.core.database.connection import SessionDep
-from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
 from app.core.database.mongo.mongo import MongoDB, mongodb
+from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
+from app.core.database.repositories.role_repository_impl import RoleRepositoryImpl
+from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
+from app.core.database.repositories.user_role_repository_impl import (
+    UserRoleRepositoryImpl,
+)
+from app.core.exceptions import get_credentials_exception
 from app.core.models.user import DbUser
+from app.core.repositories.module_repository import ModuleRepository
+from app.core.repositories.role_repository import RoleRepository
 from app.core.repositories.user_repository import UserRepository
+from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import settings
-from app.core.exceptions import (
-    get_credentials_exception,
-)
+from app.iam.services.module_service import ModuleService
+from app.iam.services.role_service import RoleService
+from app.iam.services.user_role_service import UserRoleService
+from app.iam.services.user_service import UserService
+from app.iam.usecases.create_user import CreateUserUseCase
+from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
+from app.iam.usecases.update_user import UpdateUserUseCase
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm

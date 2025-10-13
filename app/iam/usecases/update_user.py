@@ -1,11 +1,11 @@
-from app.iam.services.user_role_service import UserRoleService
-from app.iam.services.user_service import UserService
-from app.iam.services.role_service import RoleService
-from app.core.models.user import UserUpdate, UserBase
 from app.core.exceptions import (
     get_bad_request_exception,
     get_entity_not_found_exception,
 )
+from app.core.models.user import UserBase, UserUpdate
+from app.iam.services.role_service import RoleService
+from app.iam.services.user_role_service import UserRoleService
+from app.iam.services.user_service import UserService
 
 
 class UpdateUserUseCase:

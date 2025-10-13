@@ -1,5 +1,5 @@
-from app.core.repositories.module_repository import ModuleRepository
 from app.core.models.module import DbModule
+from app.core.repositories.module_repository import ModuleRepository
 
 
 class ModuleService:

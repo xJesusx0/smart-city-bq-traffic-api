@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from app.core.models.role import DbRole, RoleCreate, RoleUpdate
 
 

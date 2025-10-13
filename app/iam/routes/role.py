@@ -1,15 +1,16 @@
-from fastapi import APIRouter, status, Response, HTTPException
-from sqlalchemy.exc import IntegrityError
 import logging
+
+from fastapi import APIRouter, HTTPException, Response, status
+from sqlalchemy.exc import IntegrityError
 
 from app.core.dependencies import RoleServiceDep
 from app.core.exceptions import (
+    get_bad_request_exception,
+    get_conflict_exception,
     get_entity_not_found_exception,
     get_internal_server_error_exception,
-    get_conflict_exception,
-    get_bad_request_exception,
 )
-from app.core.models.role import RoleCreate, RoleUpdate, DbRole
+from app.core.models.role import DbRole, RoleCreate, RoleUpdate
 
 role_router = APIRouter(prefix="/api/iam/roles", tags=["roles"])
 

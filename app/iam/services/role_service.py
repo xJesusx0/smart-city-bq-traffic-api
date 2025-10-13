@@ -1,4 +1,5 @@
 from typing import Optional
+
 from app.core.models.role import DbRole, RoleCreate, RoleUpdate
 from app.core.repositories.role_repository import RoleRepository
 

@@ -1,6 +1,5 @@
-import traceback
 import logging
-
+import traceback
 from typing import Annotated
 
 from fastapi import HTTPException, status
@@ -9,19 +8,19 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.models.dtos import UserWithModulesDTO
-from app.auth.models.token import Token
 from app.auth.models.oauth_google import GoogleTokenRequest
-from app.core.security.jwt_service import create_access_token
+from app.auth.models.token import Token
 from app.core.dependencies import (
     AuthServiceDep,
     CurrentUserDep,
-    GoogleAuthServiceDep,
     GetModulesWithUseCaseDep,
+    GoogleAuthServiceDep,
 )
 from app.core.exceptions import (
     get_credentials_exception,
     get_internal_server_error_exception,
 )
+from app.core.security.jwt_service import create_access_token
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 

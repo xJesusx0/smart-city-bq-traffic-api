@@ -1,7 +1,7 @@
 import traceback
 
-from google.oauth2 import id_token
 from google.auth.transport import requests
+from google.oauth2 import id_token
 
 from app.auth.models.oauth_google import GoogleUserInfo
 from app.core.exceptions import get_credentials_exception

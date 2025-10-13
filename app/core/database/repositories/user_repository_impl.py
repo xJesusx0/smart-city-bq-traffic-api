@@ -1,11 +1,10 @@
 from datetime import datetime
-from app.core.models.user import UserCreate, UserUpdate
-from typing import Sequence
-from typing import Optional
+from typing import Optional, Sequence
+
 from sqlmodel import Session, select
 
+from app.core.models.user import DbUser, UserCreate, UserUpdate
 from app.core.repositories.user_repository import UserRepository
-from app.core.models.user import DbUser
 
 
 class UserRepositoryImpl(UserRepository):

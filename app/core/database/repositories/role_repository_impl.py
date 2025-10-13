@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional, Sequence
+
 from sqlmodel import Session, select
+
 from app.core.models.role import DbRole, RoleCreate, RoleUpdate
 from app.core.models.user_role import DbUserRole
 from app.core.repositories.role_repository import RoleRepository

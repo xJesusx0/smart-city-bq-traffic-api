@@ -11,6 +11,7 @@ dependencies = [
     "google-auth>=2.41.1",
     "google-auth-httplib2>=0.2.0",
     "google-auth-oauthlib>=1.2.2",
+    "isort>=7.0.0",
     "motor>=3.7.1",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
@@ -21,12 +22,30 @@ dependencies = [
     "sqlmodel>=0.0.25",
 ]
 
-[tool]
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+combine_as_imports = true
+known_first_party = ["app"]  # cambia "app" por el nombre de tu paquete principal
 
-[tool.pyrefly]
-project-includes = ["**/*"]
-project-excludes = [
-    "**/node_modules",
-    "**/__pycache__",
-    "**/*venv/**/*",
-]
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+# activa reglas comunes + sorting de imports
+lint.extend-select = ["I"]
+
+# ignora reglas que ya maneja black
+lint.extend-ignore = ["E501"]
+
+# donde buscar el código
+src = ["app"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+combine-as-imports = true

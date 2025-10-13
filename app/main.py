@@ -1,14 +1,15 @@
-from fastapi import FastAPI, APIRouter
+import logging
+
+import uvicorn
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.auth.routes.auth import auth_router
-from app.core.settings import settings
-from app.iam.routes.user import user_router
-from app.iam.routes.role import role_router
 from app.charts.routes.charts import charts_router
 from app.core.dependencies import validate_token
-from fastapi import Depends
-import logging
-import uvicorn
+from app.core.settings import settings
+from app.iam.routes.role import role_router
+from app.iam.routes.user import user_router
 
 router = APIRouter(prefix="/api")
 

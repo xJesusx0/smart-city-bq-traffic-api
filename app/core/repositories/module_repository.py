@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.core.models.module import DbModule
 
 

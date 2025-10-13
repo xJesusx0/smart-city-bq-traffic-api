@@ -1,23 +1,23 @@
-from app.core.exceptions import (
-    get_internal_server_error_exception,
-    get_conflict_exception,
-    get_bad_request_exception,
-)
-from app.core.validations import is_valid_email
-from sqlalchemy.exc import IntegrityError
-from fastapi import status, Response
-
-from app.core.exceptions import get_entity_not_found_exception
-from app.core.models.user import UserBase, UserCreate, UserUpdate
-
-from fastapi.routing import APIRouter
-from app.core.dependencies import (
-    UserServiceDep,
-    CreateUserUseCaseDep,
-    UpdateUserUseCaseDep,
-)
 import logging
 import traceback
+
+from fastapi import Response, status
+from fastapi.routing import APIRouter
+from sqlalchemy.exc import IntegrityError
+
+from app.core.dependencies import (
+    CreateUserUseCaseDep,
+    UpdateUserUseCaseDep,
+    UserServiceDep,
+)
+from app.core.exceptions import (
+    get_bad_request_exception,
+    get_conflict_exception,
+    get_entity_not_found_exception,
+    get_internal_server_error_exception,
+)
+from app.core.models.user import UserBase, UserCreate, UserUpdate
+from app.core.validations import is_valid_email
 
 user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 

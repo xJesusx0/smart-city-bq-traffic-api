@@ -1,10 +1,10 @@
-from app.core.models.user import UserBase
+from app.auth.models.dtos import UserWithModulesDTO
 from app.core.models.module import ModuleBase
 from app.core.models.role import RoleBase
-from app.auth.models.dtos import UserWithModulesDTO
-from app.iam.services.user_service import UserService
+from app.core.models.user import UserBase
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
+from app.iam.services.user_service import UserService
 
 
 class GetUserWithModulesUseCase:
