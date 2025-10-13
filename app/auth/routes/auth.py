@@ -41,7 +41,7 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token = create_access_token(data={"sub": user.login_name})
+    token = create_access_token(data={"sub": user.email})
 
     return Token(access_token=token, token_type="bearer")
 
@@ -65,7 +65,7 @@ def oauth_google_login(
         if user is None:
             raise get_credentials_exception("Credenciales de autenticacion invalidas")
 
-        token = create_access_token(data={"sub": user.login_name})
+        token = create_access_token(data={"sub": user.email})
 
         return Token(access_token=token, token_type="bearer")
     except ValueError:

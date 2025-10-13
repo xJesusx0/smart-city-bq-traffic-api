@@ -11,7 +11,7 @@ class AuthService:
         self.user_repository = user_repository
 
     def authenticate_user(self, username: str, password: str) -> DbUser | None:
-        user = self.user_repository.get_user_by_login_name(username)
+        user = self.user_repository.get_user_by_email(username)
         if not user:
             return None
 
@@ -29,7 +29,7 @@ class AuthService:
             if not google_user_info.email:
                 return None
 
-            user = self.user_repository.get_user_by_login_name(google_user_info.email)
+            user = self.user_repository.get_user_by_email(google_user_info.email)
 
             return user
         except Exception:

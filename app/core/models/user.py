@@ -1,12 +1,11 @@
-from app.core.models.user_role import DbUserRole
 from typing import Optional
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel
 
 from app.core.models.base import SmartCityBqBaseModel
 
 
 class UserBase(SmartCityBqBaseModel):
-    login_name: str = Field(index=True, unique=True)
+    email: str = Field(index=True, unique=True)
     name: str = Field()
     identification: str = Field(index=True, unique=True)
 
@@ -14,7 +13,7 @@ class UserBase(SmartCityBqBaseModel):
     def map_from_db(cls, db_user: "DbUser") -> "UserBase":
         return UserBase(
             id=db_user.id,
-            login_name=db_user.login_name,
+            email=db_user.email,
             name=db_user.name,
             identification=db_user.identification,
             creation_date=db_user.creation_date,
@@ -28,7 +27,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(SQLModel):
-    login_name: Optional[str] = None
+    email: Optional[str] = None
     name: Optional[str] = None
 
 

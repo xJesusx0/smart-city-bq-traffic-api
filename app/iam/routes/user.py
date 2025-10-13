@@ -1,8 +1,12 @@
 from app.core.exceptions import get_credentials_exception
 from app.core.dependencies import GetModulesWithUseCaseDep
 from app.core.dependencies import CurrentUserDep
-from app.core.exceptions import get_internal_server_error_exception
-from app.core.exceptions import get_conflict_exception
+from app.core.exceptions import (
+    get_internal_server_error_exception,
+    get_conflict_exception,
+    get_bad_request_exception,
+)
+from app.core.validations import is_valid_email
 from sqlalchemy.exc import IntegrityError
 from fastapi import status, Response
 
@@ -14,6 +18,7 @@ from fastapi.routing import APIRouter
 
 from app.core.dependencies import UserServiceDep
 import logging
+import traceback
 
 user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 
@@ -34,12 +39,14 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
 
 @user_router.post("", status_code=status.HTTP_201_CREATED, response_model=UserBase)
 def create_user(user: UserCreate, user_service: UserServiceDep):
+    valid_user = _validate_user_to_create(user)
+    if not valid_user:
+        raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
         return user_service.create_user(user)
     except IntegrityError:
         raise get_conflict_exception(
-            f"Ya existe un usuario registrado con el login_name '{user.login_name}' "
-            f"o con la identificación '{user.identification}'."
+            f"Ya existe un usuario registrado con el email '{user.email}'."
         )
     except Exception as e:
         logging.error(f"Error al guardar un usuario: {e}")
@@ -50,6 +57,9 @@ def create_user(user: UserCreate, user_service: UserServiceDep):
 
 @user_router.put("/{user_id}", response_model=UserBase)
 def update_user(user_id: int, user: UserUpdate, user_service: UserServiceDep):
+    valid_user = _validate_user_to_update(user)
+    if not valid_user:
+        raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
         updated_user = user_service.update_user(user_id, user)
         if updated_user is None:
@@ -59,7 +69,7 @@ def update_user(user_id: int, user: UserUpdate, user_service: UserServiceDep):
         return updated_user
     except IntegrityError:
         raise get_conflict_exception(
-            f"Ya existe un usuario registrado con el login_name '{user.login_name}' "
+            f"Ya existe un usuario registrado con el email '{user.email}' "
         )
     except Exception as e:
         logging.error(f"Error al guardar un usuario: {e}")
@@ -93,3 +103,41 @@ def get_current_user_modules(
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado al obtener los modulos del usuario actal"
         )
+
+
+def _validate_user_to_create(user: UserCreate):
+    if not user.email or not user.name or not user.identification or not user.password:
+        raise get_bad_request_exception("Todos los campos son obligatorios.")
+
+    if not is_valid_email(user.email):
+        raise get_bad_request_exception(
+            "El correo electrónico no tiene un formato válido."
+        )
+
+    if len(user.password) < 8:
+        raise get_bad_request_exception(
+            "La contraseña debe tener al menos 8 caracteres."
+        )
+
+    if not user.identification.isdigit():
+        raise get_bad_request_exception("La identificación debe contener solo números.")
+
+    return True
+
+
+def _validate_user_to_update(user: "UserUpdate"):
+    if not user.email and not user.name:
+        raise get_bad_request_exception(
+            "Debes enviar al menos un campo para actualizar."
+        )
+
+    if user.email:
+        if not is_valid_email(user.email):
+            raise get_bad_request_exception(
+                "El correo electrónico no tiene un formato válido."
+            )
+
+    if user.name and not user.name.strip():
+        raise get_bad_request_exception("El nombre no puede estar vacío.")
+
+    return True

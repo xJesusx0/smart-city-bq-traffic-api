@@ -33,8 +33,8 @@ class UserRepositoryImpl(UserRepository):
         result = self.session.exec(statement).first()
         return result
 
-    def get_user_by_login_name(self, login_name: str) -> Optional[DbUser]:
-        statement = select(DbUser).where(DbUser.login_name == login_name)
+    def get_user_by_email(self, email: str) -> Optional[DbUser]:
+        statement = select(DbUser).where(DbUser.email == email)
 
         result = self.session.exec(statement).first()
         return result
