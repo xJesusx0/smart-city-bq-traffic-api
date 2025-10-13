@@ -1,5 +1,6 @@
 from app.core.models.user import UserBase
 from app.core.models.module import ModuleBase
+from app.core.models.role import RoleBase
 
 
 class UserWithModulesDTO(UserBase):
@@ -8,3 +9,4 @@ class UserWithModulesDTO(UserBase):
     """
 
     modules: list[ModuleBase]
+    roles: list[RoleBase]

@@ -1,5 +1,6 @@
 from app.core.models.user import UserBase
 from app.core.models.module import ModuleBase
+from app.core.models.role import RoleBase
 from app.auth.models.dtos import UserWithModulesDTO
 from app.iam.services.user_service import UserService
 from app.iam.services.module_service import ModuleService
@@ -34,9 +35,8 @@ class GetUserWithModulesUseCase:
         if not role_ids:
             return UserWithModulesDTO(modules=[], **user.model_dump())
 
-        modules = [
-            ModuleBase.model_validate(module)
-            for module in self.module_service.get_modules_by_role_ids(role_ids)
-        ]
+        modules = self.module_service.get_modules_by_role_ids(role_ids)
+        modules = [ModuleBase.model_validate(module) for module in modules]
+        roles = [RoleBase.model_validate(role) for role in roles]
 
-        return UserWithModulesDTO(modules=modules, **user.model_dump())
+        return UserWithModulesDTO(modules=modules, roles=roles, **user.model_dump())

@@ -4,12 +4,12 @@ from sqlmodel import Field, SQLModel
 from app.core.models.base import SmartCityBqBaseModel
 
 
-class RoleBase(SQLModel):
+class RoleBase(SmartCityBqBaseModel):
     name: str = Field(index=True)
     description: Optional[str] = Field(default=None)
 
 
-class DbRole(SmartCityBqBaseModel, RoleBase, table=True):
+class DbRole(RoleBase, table=True):
     __tablename__ = "roles"
 
 
