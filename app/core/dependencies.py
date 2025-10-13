@@ -13,9 +13,10 @@ from app.iam.services.module_service import ModuleService
 from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
 from app.core.repositories.module_repository import ModuleRepository
 from app.iam.services.user_service import UserService
-from typing import Annotated
+from typing import Annotated, Any
 
 import jwt
+import traceback
 from fastapi import Depends, HTTPException, status
 from jwt import InvalidTokenError
 
@@ -28,6 +29,9 @@ from app.core.models.user import DbUser
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import settings
+from app.core.exceptions import (
+    get_credentials_exception,
+)
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -128,30 +132,34 @@ GetModulesWithUseCaseDep = Annotated[
 ]
 CreateUserUseCaseDep = Annotated[CreateUserUseCase, Depends(get_create_user_use_case)]
 UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]
+
 # --- Security
 
 
-def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], user_repository: UserRepoDep
-) -> DbUser:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
+def validate_token(token: Annotated[str, Depends(oauth2_scheme)]) -> dict[str, Any]:
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         username: str | None = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise get_credentials_exception()
 
+        return payload
     except InvalidTokenError:
-        raise credentials_exception
+        print(traceback.format_exc())
+        raise get_credentials_exception("Token invalido")
+
+
+ValidTokenDep = Annotated[dict[str, Any], Depends(validate_token)]
+
+
+def get_current_user(payload: ValidTokenDep, user_repository: UserRepoDep) -> DbUser:
+    username: str | None = payload.get("sub")
+    if username is None:
+        raise get_credentials_exception()
 
     user = user_repository.get_user_by_email(username)
     if user is None:
-        raise credentials_exception
+        raise get_credentials_exception()
 
     return user
 

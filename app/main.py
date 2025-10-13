@@ -5,7 +5,8 @@ from app.core.settings import settings
 from app.iam.routes.user import user_router
 from app.iam.routes.role import role_router
 from app.charts.routes.charts import charts_router
-
+from app.core.dependencies import validate_token
+from fastapi import Depends
 import logging
 import uvicorn
 
@@ -26,9 +27,9 @@ app.add_middleware(
 
 app.include_router(router)
 app.include_router(auth_router)
-app.include_router(user_router)
-app.include_router(role_router)
-app.include_router(charts_router)
+app.include_router(user_router, dependencies=[Depends(validate_token)])
+app.include_router(role_router, dependencies=[Depends(validate_token)])
+app.include_router(charts_router, dependencies=[Depends(validate_token)])
 
 
 def start():
