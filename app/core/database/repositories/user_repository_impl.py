@@ -67,6 +67,8 @@ class UserRepositoryImpl(UserRepository):
 
         user_data = user.model_dump(exclude_unset=True)
         for key, value in user_data.items():
+            if key == "roles":
+                continue
             setattr(db_user, key, value)
 
         db_user.update_date = datetime.now()

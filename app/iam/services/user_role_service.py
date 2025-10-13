@@ -22,3 +22,9 @@ class UserRoleService:
         Assigns multiple roles to a user.
         """
         self.user_role_repository.assign_roles_to_user(user_id, role_ids)
+
+    def remove_all_roles_from_user(self, user_id: int) -> None:
+        """
+        Removes all roles from a user.
+        """
+        self.user_role_repository.remove_all_roles_from_user(user_id)

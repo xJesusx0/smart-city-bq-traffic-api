@@ -5,14 +5,19 @@ from app.core.exceptions import (
 )
 from app.core.validations import is_valid_email
 from sqlalchemy.exc import IntegrityError
-from fastapi import status, Response
+from fastapi import status, Response, HTTPException
 
 from app.core.exceptions import get_entity_not_found_exception
 from app.core.models.user import UserBase, UserCreate, UserUpdate
 
 from fastapi.routing import APIRouter
-from app.core.dependencies import UserServiceDep, CreateUserUseCaseDep
+from app.core.dependencies import (
+    UserServiceDep,
+    CreateUserUseCaseDep,
+    UpdateUserUseCaseDep,
+)
 import logging
+import traceback
 
 user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 
@@ -50,22 +55,21 @@ def create_user(user: UserCreate, create_user_use_case: CreateUserUseCaseDep):
 
 
 @user_router.put("/{user_id}", response_model=UserBase)
-def update_user(user_id: int, user: UserUpdate, user_service: UserServiceDep):
+def update_user(
+    user_id: int, user: UserUpdate, update_user_use_case: UpdateUserUseCaseDep
+):
     valid_user = _validate_user_to_update(user)
     if not valid_user:
         raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
-        updated_user = user_service.update_user(user_id, user)
-        if updated_user is None:
-            raise get_entity_not_found_exception(
-                f"Usuario con id {user_id} no encontrado"
-            )
-        return updated_user
+        return update_user_use_case.invoke(user_id, user)
     except IntegrityError:
+        print(traceback.format_exc())
         raise get_conflict_exception(
             f"Ya existe un usuario registrado con el email '{user.email}' "
         )
     except Exception as e:
+        print(traceback.format_exc())
         logging.error(f"Error al guardar un usuario: {e}")
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado, contacte con un administrador"
@@ -104,7 +108,7 @@ def _validate_user_to_create(user: UserCreate):
 
 
 def _validate_user_to_update(user: "UserUpdate"):
-    if not user.email and not user.name:
+    if not user.email and not user.name and user.roles is None:
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."
         )
@@ -117,5 +121,8 @@ def _validate_user_to_update(user: "UserUpdate"):
 
     if user.name and not user.name.strip():
         raise get_bad_request_exception("El nombre no puede estar vacío.")
+
+    if user.roles is not None and not isinstance(user.roles, list):
+        raise get_bad_request_exception("Roles debe ser una lista de números.")
 
     return True

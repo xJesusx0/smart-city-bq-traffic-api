@@ -1,10 +1,13 @@
-from app.core.database.repositories.user_role_repository_impl import UserRoleRepositoryImpl
+from app.core.database.repositories.user_role_repository_impl import (
+    UserRoleRepositoryImpl,
+)
 from app.core.repositories.user_role_repository import UserRoleRepository
 from app.iam.services.role_service import RoleService
 from app.core.database.repositories.role_repository_impl import RoleRepositoryImpl
 from app.core.repositories.role_repository import RoleRepository
 from app.iam.services.user_role_service import UserRoleService
 from app.iam.usecases.create_user import CreateUserUseCase
+from app.iam.usecases.update_user import UpdateUserUseCase
 from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
 from app.iam.services.module_service import ModuleService
 from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
@@ -44,8 +47,10 @@ def get_module_repository(session: SessionDep) -> ModuleRepository:
 def get_role_repository(session: SessionDep) -> RoleRepository:
     return RoleRepositoryImpl(session)
 
+
 def get_user_role_repository(session: SessionDep) -> UserRoleRepository:
     return UserRoleRepositoryImpl(session=session)
+
 
 async def get_mongo_db() -> MongoDB:
     await mongodb.ensure_connection()
@@ -80,8 +85,10 @@ def get_module_service(module_repository: ModuleRepoDep) -> ModuleService:
 def get_role_service(role_repository: RoleRepoDeb) -> RoleService:
     return RoleService(role_repository=role_repository)
 
+
 def get_user_role_service(user_role_repository: UserRoleRepoDep) -> UserRoleService:
     return UserRoleService(user_role_repository=user_role_repository)
+
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
@@ -99,19 +106,28 @@ def get_get_user_with_modules_use_case(
 ) -> GetUserWithModulesUseCase:
     return GetUserWithModulesUseCase(user_service, module_service, role_service)
 
+
 def get_create_user_use_case(
     user_service: UserServiceDep,
     role_service: RoleServiceDep,
-    user_role_service: UserRoleServiceDep
+    user_role_service: UserRoleServiceDep,
 ) -> CreateUserUseCase:
     return CreateUserUseCase(user_service, role_service, user_role_service)
+
+
+def get_update_user_use_case(
+    user_service: UserServiceDep,
+    role_service: RoleServiceDep,
+    user_role_service: UserRoleServiceDep,
+) -> UpdateUserUseCase:
+    return UpdateUserUseCase(user_service, role_service, user_role_service)
+
 
 GetModulesWithUseCaseDep = Annotated[
     GetUserWithModulesUseCase, Depends(get_get_user_with_modules_use_case)
 ]
-CreateUserUseCaseDep = Annotated[
-    CreateUserUseCase, Depends(get_create_user_use_case)
-]
+CreateUserUseCaseDep = Annotated[CreateUserUseCase, Depends(get_create_user_use_case)]
+UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]
 # --- Security
 
 

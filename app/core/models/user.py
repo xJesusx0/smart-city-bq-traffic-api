@@ -30,6 +30,7 @@ class UserCreate(UserBase):
 class UserUpdate(SQLModel):
     email: Optional[str] = None
     name: Optional[str] = None
+    roles: Optional[list[int]] = None
 
 
 class DbUser(UserBase, table=True):
