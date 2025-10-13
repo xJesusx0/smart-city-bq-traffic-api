@@ -87,7 +87,7 @@ def oauth_google_login(
 def me(
     current_user: CurrentUserDep,
     get_user_with_modules_use_case: GetModulesWithUseCaseDep,
-):
+) -> UserWithModulesDTO:
     if current_user.id is None:
         raise get_credentials_exception()
 

@@ -1,6 +1,7 @@
 from app.core.models.user import UserBase
+from app.core.models.module import ModuleBase
+from app.auth.models.dtos import UserWithModulesDTO
 from app.iam.services.user_service import UserService
-from app.iam.dtos.user import UserWithModulesDTO
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
 
@@ -22,9 +23,20 @@ class GetUserWithModulesUseCase:
         self.role_service = role_service
 
     def invoke(self, user: UserBase) -> UserWithModulesDTO:
-        roles = self.role_service.get_roles_by_user_id(user.id)
+        if user.id is None:
+            raise ValueError("User ID cannot be None")
 
-        role_ids = [role.id for role in roles]
-        modules = self.module_service.get_modules_by_role_ids(role_ids)
+        roles = self.role_service.get_roles_by_user_id(user.id)
+        if not roles:
+            return UserWithModulesDTO(modules=[], **user.model_dump())
+
+        role_ids = [role.id for role in roles if role.id is not None]
+        if not role_ids:
+            return UserWithModulesDTO(modules=[], **user.model_dump())
+
+        modules = [
+            ModuleBase.model_validate(module)
+            for module in self.module_service.get_modules_by_role_ids(role_ids)
+        ]
 
         return UserWithModulesDTO(modules=modules, **user.model_dump())
