@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.auth.routes.auth import auth_router
 from app.core.settings import settings
 from app.iam.routes.user import user_router
+from app.iam.routes.role import role_router
 from app.charts.routes.charts import charts_router
 
 import logging
@@ -26,6 +27,7 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(role_router)
 app.include_router(charts_router)
 
 

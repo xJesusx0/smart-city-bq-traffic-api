@@ -1,4 +1,5 @@
-from app.core.models.role import DbRole
+from typing import Optional
+from app.core.models.role import DbRole, RoleCreate, RoleUpdate
 from app.core.repositories.role_repository import RoleRepository
 
 
@@ -11,3 +12,18 @@ class RoleService:
         Gets all roles for a given user.
         """
         return self.role_repository.get_roles_by_user_id(user_id)
+
+    def get_all_roles(self) -> list[DbRole]:
+        return self.role_repository.get_all_roles()
+
+    def get_role_by_id(self, role_id: int) -> Optional[DbRole]:
+        return self.role_repository.get_role_by_id(role_id)
+
+    def create_role(self, role: RoleCreate) -> DbRole:
+        return self.role_repository.create_role(role)
+
+    def update_role(self, role_id: int, role: RoleUpdate) -> Optional[DbRole]:
+        return self.role_repository.update_role(role_id, role)
+
+    def delete_role(self, role_id: int) -> Optional[DbRole]:
+        return self.role_repository.delete_role_by_id(role_id)
