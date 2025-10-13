@@ -1,4 +1,7 @@
-from app.core.models.user import DbUser
+import traceback
+
+from app.core.models.user import DbUser, UserCreate
+from app.auth.models.oauth_google import GoogleUserInfo
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.encryption_service import verify
 
@@ -18,3 +21,17 @@ class AuthService:
         if verify(password, user.password):
             return user
         return None
+
+    def authenticate_google_user(
+        self, google_user_info: GoogleUserInfo
+    ) -> DbUser | None:
+        try:
+            if not google_user_info.email:
+                return None
+
+            user = self.user_repository.get_user_by_login_name(google_user_info.email)
+
+            return user
+        except Exception:
+            print(traceback.format_exc())
+            return None

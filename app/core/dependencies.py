@@ -13,6 +13,7 @@ from fastapi import Depends, HTTPException, status
 from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService
+from app.auth.services.google_auth_service import GoogleAuthService
 from app.core.database.connection import SessionDep
 from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
 from app.core.models.user import DbUser
@@ -45,6 +46,10 @@ RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
 # --- Services
 
 
+def get_google_auth_service() -> GoogleAuthService:
+    return GoogleAuthService(client_id=settings.google_client_id)
+
+
 def get_auth_service(user_repository: UserRepoDep) -> AuthService:
     return AuthService(user_repository=user_repository)
 
@@ -65,6 +70,7 @@ AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
 RoleServiceDep = Annotated[RoleService, Depends(get_role_service)]
+GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 
 
 # --- Usecases
