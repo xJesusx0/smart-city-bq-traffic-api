@@ -69,3 +69,10 @@ class RoleRepositoryImpl(RoleRepository):
             self.session.refresh(role)
 
         return role
+
+    def get_roles_by_ids(self, role_ids: list[int]) -> list[DbRole]:
+        if not role_ids:
+            return []
+
+        roles = self.session.exec(select(DbRole).where(DbRole.id.in_(role_ids))).all()  # type: ignore
+        return list(roles)

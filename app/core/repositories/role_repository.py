@@ -30,3 +30,7 @@ class RoleRepository(ABC):
     @abstractmethod
     def delete_role_by_id(self, role_id: int) -> Optional[DbRole]:
         pass
+
+    @abstractmethod
+    def get_roles_by_ids(self, role_ids: list[int]) -> list[DbRole]:
+        pass

@@ -27,3 +27,6 @@ class RoleService:
 
     def delete_role(self, role_id: int) -> Optional[DbRole]:
         return self.role_repository.delete_role_by_id(role_id)
+
+    def get_roles_by_ids(self, role_ids: list[int]) -> list[DbRole]:
+        return self.role_repository.get_roles_by_ids(role_ids)
