@@ -16,6 +16,7 @@ from app.auth.services.auth_service import AuthService
 from app.auth.services.google_auth_service import GoogleAuthService
 from app.core.database.connection import SessionDep
 from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
+from app.core.database.mongo.mongo import MongoDB, mongodb
 from app.core.models.user import DbUser
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.security import oauth2_scheme
@@ -40,9 +41,15 @@ def get_role_repository(session: SessionDep) -> RoleRepository:
     return RoleRepositoryImpl(session)
 
 
+async def get_mongo_db() -> MongoDB:
+    await mongodb.ensure_connection()
+    return mongodb
+
+
 UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
+MongoDBDep = Annotated[MongoDB, Depends(get_mongo_db)]
 # --- Services
 
 
