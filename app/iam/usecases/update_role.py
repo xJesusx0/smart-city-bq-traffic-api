@@ -2,7 +2,7 @@ from app.core.exceptions import (
     get_bad_request_exception,
     get_entity_not_found_exception,
 )
-from app.core.models.role import RoleUpdate, RoleBase
+from app.core.models.role import RoleBase, RoleUpdate
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService

@@ -74,9 +74,7 @@ UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
 UserRoleRepoDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]
-ModuleRoleRepoDep = Annotated[
-    ModuleRoleRepository, Depends(get_module_role_repository)
-]
+ModuleRoleRepoDep = Annotated[ModuleRoleRepository, Depends(get_module_role_repository)]
 
 MongoDBDep = Annotated[MongoDB, Depends(get_mongo_db)]
 # --- Services

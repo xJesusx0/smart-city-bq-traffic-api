@@ -51,7 +51,9 @@ def create_role(role: RoleCreate, create_role_use_case: CreateRoleUseCaseDep):
 
 
 @role_router.put("/{role_id}", response_model=RoleBase)
-def update_role(role_id: int, role: RoleUpdate, update_role_use_case: UpdateRoleUseCaseDep):
+def update_role(
+    role_id: int, role: RoleUpdate, update_role_use_case: UpdateRoleUseCaseDep
+):
     if not role.name and not role.description and role.modules is None:
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."

@@ -1,5 +1,5 @@
 from app.core.exceptions import get_bad_request_exception
-from app.core.models.role import RoleCreate, RoleBase
+from app.core.models.role import RoleBase, RoleCreate
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
