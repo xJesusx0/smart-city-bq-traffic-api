@@ -1,0 +1,45 @@
+name: Ruff Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+      - "ruff.toml"
+      - ".github/workflows/ruff-lint.yml"
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "**.py"
+      - "pyproject.toml"
+      - "ruff.toml"
+      - ".github/workflows/ruff-lint.yml"
+
+jobs:
+  lint:
+    name: Run Ruff check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13" # No necesitas el patch version
+          cache: "pip" # Cachea dependencias de pip
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff check
+        run: ruff check . --output-format=github
+
+      - name: Run Ruff format check
+        run: ruff format --check .
