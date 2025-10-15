@@ -28,3 +28,9 @@ class UserRoleService:
         Removes all roles from a user.
         """
         self.user_role_repository.remove_all_roles_from_user(user_id)
+
+    def sync_user_roles(self, user_id: int, role_ids: list[int]) -> None:
+        """
+        Synchronizes the roles of a user with the given list of role IDs.
+        """
+        self.user_role_repository.sync_user_roles(user_id, role_ids)

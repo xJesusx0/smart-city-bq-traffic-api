@@ -12,3 +12,4 @@ wheels/
 .env.prod
 
 .idea/
+.ruff_cache/

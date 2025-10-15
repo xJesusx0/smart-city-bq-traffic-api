@@ -29,3 +29,11 @@ class ModuleRepositoryImpl(ModuleRepository):
 
         results = self.session.exec(statement).all()
         return list(results)
+
+    def get_modules_by_ids(self, module_ids: list[int]) -> list[DbModule]:
+        if not module_ids:
+            return []
+
+        statement = select(DbModule).where(DbModule.id.in_(module_ids))  # type: ignore
+        results = self.session.exec(statement).all()
+        return list(results)

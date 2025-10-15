@@ -13,3 +13,9 @@ class ModuleService:
         modules = self.module_repository.get_modules_by_role_ids(role_ids)
         print(modules)
         return modules
+
+    def get_modules_by_ids(self, module_ids: list[int]) -> list[DbModule]:
+        """
+        Gets all modules by a list of IDs.
+        """
+        return self.module_repository.get_modules_by_ids(module_ids)

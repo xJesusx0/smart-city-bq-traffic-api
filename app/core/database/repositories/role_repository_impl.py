@@ -52,6 +52,9 @@ class RoleRepositoryImpl(RoleRepository):
 
         role_data = role.model_dump(exclude_unset=True)
         for key, value in role_data.items():
+            if key == "modules":
+                continue
+
             setattr(db_role, key, value)
 
         db_role.update_date = datetime.now()
