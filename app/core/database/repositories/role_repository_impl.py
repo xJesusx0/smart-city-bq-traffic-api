@@ -31,6 +31,11 @@ class RoleRepositoryImpl(RoleRepository):
         results: Sequence[DbRole] = self.session.exec(statement).all()
         return list(results)
 
+    def get_all_roles_by_active(self, active: bool) -> list[DbRole]:
+        statement = select(DbRole).where(DbRole.active == active)
+        results: Sequence[DbRole] = self.session.exec(statement).all()
+        return list(results)
+
     def get_role_by_id(self, role_id: int) -> Optional[DbRole]:
         statement = select(DbRole).where(DbRole.id == role_id)
         result = self.session.exec(statement).first()

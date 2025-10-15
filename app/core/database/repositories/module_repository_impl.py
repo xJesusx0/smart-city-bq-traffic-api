@@ -43,6 +43,11 @@ class ModuleRepositoryImpl(ModuleRepository):
         results = self.session.exec(statement).all()
         return list(results)
 
+    def get_all_modules_by_active(self, active: bool) -> list[DbModule]:
+        statement = select(DbModule).where(DbModule.active == active)
+        results = self.session.exec(statement).all()
+        return list(results)
+
     def get_module_by_id(self, module_id: int) -> DbModule | None:
         statement = select(DbModule).where(DbModule.id == module_id)
         return self.session.exec(statement).first()

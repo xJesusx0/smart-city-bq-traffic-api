@@ -17,6 +17,10 @@ class RoleRepository(ABC):
         pass
 
     @abstractmethod
+    def get_all_roles_by_active(self, active: bool) -> list[DbRole]:
+        pass
+
+    @abstractmethod
     def get_role_by_id(self, role_id: int) -> Optional[DbRole]:
         pass
 

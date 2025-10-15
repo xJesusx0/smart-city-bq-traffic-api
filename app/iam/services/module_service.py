@@ -20,11 +20,14 @@ class ModuleService:
         """
         return self.module_repository.get_modules_by_ids(module_ids)
 
-    def get_all_modules(self) -> list[DbModule]:
+    def get_all_modules(self, active: bool | None = None) -> list[DbModule]:
         """
         Gets all modules.
         """
-        return self.module_repository.get_all_modules()
+        if active is None:
+            return self.module_repository.get_all_modules()
+        else:
+            return self.module_repository.get_all_modules_by_active(active=active)
 
     def get_module_by_id(self, module_id: int) -> DbModule | None:
         """

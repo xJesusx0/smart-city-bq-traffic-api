@@ -8,8 +8,8 @@ module_router = APIRouter(prefix="/api/iam/modules", tags=["modules"])
 
 
 @module_router.get("", response_model=list[ModuleBase])
-def get_all_modules(module_service: ModuleServiceDep):
-    return module_service.get_all_modules()
+def get_all_modules(module_service: ModuleServiceDep, active: bool | None = None):
+    return module_service.get_all_modules(active=active)
 
 
 @module_router.get("/{module_id}", response_model=ModuleBase)

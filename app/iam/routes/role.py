@@ -20,8 +20,8 @@ role_router = APIRouter(prefix="/api/iam/roles", tags=["roles"])
 
 
 @role_router.get("", response_model=list[RoleBase])
-def get_all_roles(role_service: RoleServiceDep):
-    return role_service.get_all_roles()
+def get_all_roles(role_service: RoleServiceDep, active: bool | None = None):
+    return role_service.get_all_roles(active=active)
 
 
 @role_router.get("/{role_id}", response_model=RoleBase)

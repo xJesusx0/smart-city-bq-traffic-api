@@ -26,6 +26,13 @@ class ModuleRepository(ABC):
         pass
 
     @abstractmethod
+    def get_all_modules_by_active(self, active: bool) -> list[DbModule]:
+        """
+        Retrieves all modules by active status.
+        """
+        pass
+
+    @abstractmethod
     def get_module_by_id(self, module_id: int) -> DbModule | None:
         """
         Retrieves a module by its ID.
