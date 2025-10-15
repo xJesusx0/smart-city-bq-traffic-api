@@ -44,11 +44,7 @@ class UpdateUserUseCase:
 
         # Sync roles
         if user_to_update.roles is not None:
-            self.user_role_service.remove_all_roles_from_user(user_id)
-            if user_to_update.roles:
-                self.user_role_service.assign_roles_to_user(
-                    user_id, user_to_update.roles
-                )
+            self.user_role_service.sync_user_roles(user_id, user_to_update.roles)
 
         # Return user with updated data
         return self.user_service.get_user_by_id(user_id)
