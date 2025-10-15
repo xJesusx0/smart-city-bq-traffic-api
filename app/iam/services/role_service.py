@@ -34,3 +34,6 @@ class RoleService:
 
     def get_roles_by_ids(self, role_ids: list[int]) -> list[DbRole]:
         return self.role_repository.get_roles_by_ids(role_ids)
+
+    def get_roles_map_by_user_ids(self, user_ids: list[int]) -> dict[int, list[DbRole]]:
+        return self.role_repository.get_roles_by_user_ids_map(user_ids)

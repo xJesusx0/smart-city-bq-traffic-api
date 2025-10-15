@@ -1,0 +1,247 @@
+---
+description: General Rules that should be respected application-wide
+globs:
+alwaysApply: true
+---
+
+You are an expert in Python programming, FastAPI, SQLAlchemy, Pydantic, Alembic, and modern backend architectures.
+
+---
+
+## 🧩 General Considerations
+
+- Only modify code directly relevant to the specific request. Avoid changing unrelated logic.
+- Never replace code with placeholders like `# ... rest of logic ...`. Always include complete, functional code.
+- Break problems into smaller steps and reason through each before implementing.
+- Always provide a clear PLAN and REASONING before coding changes.
+- Explain your OBSERVATIONS clearly and justify conclusions based on logs, stack traces, or behavior.
+- Use logging for diagnostic information, not print statements.
+- Ensure new code aligns with defined architectural and domain standards.
+
+---
+
+## 🧱 Code Style
+
+- Follow **PEP 8** conventions and use **Ruff** for linting and formatting enforcement.
+- Maintain **clean, readable, and well-documented** Python code.
+- Use **type hints** everywhere (`def get_user(id: int) -> User:`).
+- Docstrings must follow the **Google-style** or **PEP 257** format.
+- Keep functions short and cohesive (single responsibility principle).
+- Avoid circular dependencies by using dependency inversion or repository patterns.
+
+---
+
+## 📦 Structure
+
+The application follows a **modular architecture**, divided into functional domains:
+
+app/  
+├── core/ # Config, security, utils  
+├── domains/  
+│ ├── auth/ # Login, tokens, OAuth  
+│ ├── iam/ # Users, roles, permissions  
+│ ├── charts/ # Analytics, metrics, MongoDB access  
+│ ├── traffic/ # Cameras, locations, devices, semaphores  
+│ └── **init**.py  
+├── db/ # SQLAlchemy engine, Base, Alembic migrations  
+├── tests/ # pytest test cases  
+├── main.py # FastAPI entrypoint  
+└── pyproject.toml
+Each domain must include:
+
+- `models.py` (SQLAlchemy entities)
+- `schemas.py` (Pydantic models)
+- `repositories.py` (Data access logic)
+- `services.py` (Business logic)
+- `routers.py` (FastAPI endpoints)
+
+Common code (logging, error handling, utils) goes in `app/core` or `app/common`.
+
+---
+
+## ⚙️ FastAPI Specifics
+
+- Use dependency injection via `Depends`.
+- Configure routers with clear prefixes and tags (`router = APIRouter(prefix="/users", tags=["Users"])`).
+- Use `response_model` in endpoints to ensure schema consistency.
+- Implement global exception handling with `@app.exception_handler` or a centralized `error_handler.py`.
+- Use `HTTPException` with meaningful status codes and messages.
+- Prefer **async** functions throughout (`async def`).
+
+---
+
+## 🧾 Naming Conventions
+
+- Use `PascalCase` for classes: `UserService`, `UserRepository`.
+- Use `snake_case` for variables and functions: `get_user_by_id`.
+- Use `ALL_CAPS` for constants: `JWT_ALGORITHM`, `DEFAULT_LIMIT`.
+- Keep filenames lowercase with underscores.
+
+---
+
+## 🗄️ Data and ORM
+
+- Use **SQLAlchemy 2.0** declarative mappings.
+- Maintain a single shared `Base` in `app/db/base.py`.
+- Use **Alembic** for schema migrations.
+- Implement relationships with proper cascades and lazy loading.
+- Avoid business logic in entities — keep it in services.
+
+Example:
+
+````python
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+
+
+🧰 Configuration
+
+- Store configuration in `app/core/config.py`.
+
+- Use `pydantic-settings` for environment-based configuration.
+
+- Use `.env` files and type-safe `Settings` classes.
+
+- Define separate configurations for `dev`, `test`, and `prod`.
+
+
+Example:
+
+```python
+class Settings(BaseSettings):
+    database_url: str
+    jwt_secret_key: str
+    class Config:
+        env_file = ".env"
+
+
+---
+
+## 🔒 Security
+
+- Implement authentication and authorization using **JWT**.
+
+- Store hashed passwords using **bcrypt**.
+
+- Validate tokens via dependencies.
+
+- Apply CORS configuration globally.
+
+- Implement RBAC (Role-Based Access Control) in `iam` domain.
+
+- Sanitize all inputs — never trust client data.
+
+
+---
+
+## 🧠 Dependency Injection and IoC
+
+- Use FastAPI’s dependency injection (`Depends`) for services and repositories.
+
+- Avoid global state; prefer scoped dependencies.
+
+- Initialize dependencies in `app/main.py` or `app/core/deps.py`.
+
+
+---
+
+## 🧪 Testing
+
+- Use **pytest** for unit and integration tests.
+
+- Use **httpx.AsyncClient** or `TestClient` for API tests.
+
+- Mock database dependencies using `pytest fixtures`.
+
+- Structure tests mirroring domain layout.
+
+- Ensure coverage for:
+
+    - Models and schema validation
+
+    - Business logic in services
+
+    - API endpoints behavior
+
+- Run tests in CI via GitHub Actions.
+
+
+---
+
+## ⚡ Performance and Scalability
+
+- Use async SQLAlchemy sessions.
+
+- Implement caching via `aiocache` or Redis when applicable.
+
+- Minimize N+1 queries with `selectinload` or joins.
+
+- Offload long tasks using Celery or BackgroundTasks.
+
+- Optimize indexes and queries.
+
+
+---
+
+## 📊 Logging and Monitoring
+
+- Use **structlog** or **logging** (standard library) with JSON output.
+
+- Use log levels appropriately: `ERROR`, `WARNING`, `INFO`, `DEBUG`.
+
+- Centralize log configuration in `app/core/logging.py`.
+
+- Expose `/health` and `/metrics` endpoints for monitoring (via FastAPI and Prometheus).
+
+
+---
+
+## 📜 API Documentation
+
+- Use **FastAPI’s built-in OpenAPI/Swagger** for documentation.
+
+- Add `summary` and `description` to all route docstrings.
+
+- Annotate responses with `response_model` and status codes.
+
+- Include error response models for consistent error handling.
+
+
+---
+
+## 🧩 Build and Deployment
+
+- Use **Poetry** or **uv** for dependency management.
+
+- Enforce consistent environments via `pyproject.toml`.
+
+- Use Docker for containerization.
+
+- Configure CI/CD with **GitHub Actions**:
+
+    - Lint with `ruff check`
+
+    - Test with `pytest`
+
+    - Build and deploy to environments
+
+- Apply versioning and tagging to deployments.
+
+
+---
+
+## 🧱 Best Practices Summary
+
+- Respect **SOLID** principles and domain-driven design (DDD) at a Pythonic level.
+
+- Maintain **high cohesion, low coupling** between modules.
+
+- Prefer **composition over inheritance**.
+
+- Keep code **async, typed, and testable**.
+
+- Prioritize readability, consistency, and maintainability.
+
+````
