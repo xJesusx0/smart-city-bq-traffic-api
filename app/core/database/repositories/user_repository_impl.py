@@ -1,11 +1,10 @@
 from datetime import datetime
-from app.core.models.user import UserCreate, UserUpdate
-from typing import Sequence
-from typing import Optional
+from typing import Optional, Sequence
+
 from sqlmodel import Session, select
 
+from app.core.models.user import DbUser, UserCreate, UserUpdate
 from app.core.repositories.user_repository import UserRepository
-from app.core.models.user import DbUser
 
 
 class UserRepositoryImpl(UserRepository):
@@ -67,6 +66,8 @@ class UserRepositoryImpl(UserRepository):
 
         user_data = user.model_dump(exclude_unset=True)
         for key, value in user_data.items():
+            if key == "roles":
+                continue
             setattr(db_user, key, value)
 
         db_user.update_date = datetime.now()

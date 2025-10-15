@@ -1,26 +1,35 @@
-from app.iam.services.role_service import RoleService
-from app.core.database.repositories.role_repository_impl import RoleRepositoryImpl
-from app.core.repositories.role_repository import RoleRepository
-from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
-from app.iam.services.module_service import ModuleService
-from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
-from app.core.repositories.module_repository import ModuleRepository
-from app.iam.services.user_service import UserService
-from typing import Annotated
+import traceback
+from typing import Annotated, Any
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService
 from app.auth.services.google_auth_service import GoogleAuthService
 from app.core.database.connection import SessionDep
-from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
 from app.core.database.mongo.mongo import MongoDB, mongodb
+from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
+from app.core.database.repositories.role_repository_impl import RoleRepositoryImpl
+from app.core.database.repositories.user_repository_impl import UserRepositoryImpl
+from app.core.database.repositories.user_role_repository_impl import (
+    UserRoleRepositoryImpl,
+)
+from app.core.exceptions import get_credentials_exception
 from app.core.models.user import DbUser
+from app.core.repositories.module_repository import ModuleRepository
+from app.core.repositories.role_repository import RoleRepository
 from app.core.repositories.user_repository import UserRepository
+from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import settings
+from app.iam.services.module_service import ModuleService
+from app.iam.services.role_service import RoleService
+from app.iam.services.user_role_service import UserRoleService
+from app.iam.services.user_service import UserService
+from app.iam.usecases.create_user import CreateUserUseCase
+from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
+from app.iam.usecases.update_user import UpdateUserUseCase
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -41,6 +50,10 @@ def get_role_repository(session: SessionDep) -> RoleRepository:
     return RoleRepositoryImpl(session)
 
 
+def get_user_role_repository(session: SessionDep) -> UserRoleRepository:
+    return UserRoleRepositoryImpl(session=session)
+
+
 async def get_mongo_db() -> MongoDB:
     await mongodb.ensure_connection()
     return mongodb
@@ -49,6 +62,8 @@ async def get_mongo_db() -> MongoDB:
 UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
+UserRoleRepoDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]
+
 MongoDBDep = Annotated[MongoDB, Depends(get_mongo_db)]
 # --- Services
 
@@ -73,10 +88,15 @@ def get_role_service(role_repository: RoleRepoDeb) -> RoleService:
     return RoleService(role_repository=role_repository)
 
 
+def get_user_role_service(user_role_repository: UserRoleRepoDep) -> UserRoleService:
+    return UserRoleService(user_role_repository=user_role_repository)
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
 RoleServiceDep = Annotated[RoleService, Depends(get_role_service)]
+UserRoleServiceDep = Annotated[UserRoleService, Depends(get_user_role_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 
 
@@ -89,33 +109,55 @@ def get_get_user_with_modules_use_case(
     return GetUserWithModulesUseCase(user_service, module_service, role_service)
 
 
+def get_create_user_use_case(
+    user_service: UserServiceDep,
+    role_service: RoleServiceDep,
+    user_role_service: UserRoleServiceDep,
+) -> CreateUserUseCase:
+    return CreateUserUseCase(user_service, role_service, user_role_service)
+
+
+def get_update_user_use_case(
+    user_service: UserServiceDep,
+    role_service: RoleServiceDep,
+    user_role_service: UserRoleServiceDep,
+) -> UpdateUserUseCase:
+    return UpdateUserUseCase(user_service, role_service, user_role_service)
+
+
 GetModulesWithUseCaseDep = Annotated[
     GetUserWithModulesUseCase, Depends(get_get_user_with_modules_use_case)
 ]
+CreateUserUseCaseDep = Annotated[CreateUserUseCase, Depends(get_create_user_use_case)]
+UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]
+
 # --- Security
 
 
-def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], user_repository: UserRepoDep
-) -> DbUser:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
+def validate_token(token: Annotated[str, Depends(oauth2_scheme)]) -> dict[str, Any]:
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         username: str | None = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise get_credentials_exception()
 
+        return payload
     except InvalidTokenError:
-        raise credentials_exception
+        print(traceback.format_exc())
+        raise get_credentials_exception("Token invalido")
+
+
+ValidTokenDep = Annotated[dict[str, Any], Depends(validate_token)]
+
+
+def get_current_user(payload: ValidTokenDep, user_repository: UserRepoDep) -> DbUser:
+    username: str | None = payload.get("sub")
+    if username is None:
+        raise get_credentials_exception()
 
     user = user_repository.get_user_by_email(username)
     if user is None:
-        raise credentials_exception
+        raise get_credentials_exception()
 
     return user
 

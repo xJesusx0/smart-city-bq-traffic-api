@@ -1,24 +1,23 @@
-from app.core.exceptions import get_credentials_exception
-from app.core.dependencies import GetModulesWithUseCaseDep
-from app.core.dependencies import CurrentUserDep
-from app.core.exceptions import (
-    get_internal_server_error_exception,
-    get_conflict_exception,
-    get_bad_request_exception,
-)
-from app.core.validations import is_valid_email
-from sqlalchemy.exc import IntegrityError
-from fastapi import status, Response
-
-from app.core.exceptions import get_entity_not_found_exception
-from app.core.models.user import UserBase, UserCreate, UserUpdate
-from app.iam.dtos.user import UserWithModulesDTO
-
-from fastapi.routing import APIRouter
-
-from app.core.dependencies import UserServiceDep
 import logging
 import traceback
+
+from fastapi import Response, status
+from fastapi.routing import APIRouter
+from sqlalchemy.exc import IntegrityError
+
+from app.core.dependencies import (
+    CreateUserUseCaseDep,
+    UpdateUserUseCaseDep,
+    UserServiceDep,
+)
+from app.core.exceptions import (
+    get_bad_request_exception,
+    get_conflict_exception,
+    get_entity_not_found_exception,
+    get_internal_server_error_exception,
+)
+from app.core.models.user import UserBase, UserCreate, UserUpdate
+from app.core.validations import is_valid_email
 
 user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 
@@ -38,15 +37,15 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
 
 
 @user_router.post("", status_code=status.HTTP_201_CREATED, response_model=UserBase)
-def create_user(user: UserCreate, user_service: UserServiceDep):
+def create_user(user: UserCreate, create_user_use_case: CreateUserUseCaseDep):
     valid_user = _validate_user_to_create(user)
     if not valid_user:
         raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
-        return user_service.create_user(user)
+        return create_user_use_case.invoke(user)
     except IntegrityError:
         raise get_conflict_exception(
-            f"Ya existe un usuario registrado con el email '{user.email}'."
+            f"Ya existe un usuario registrado con el email '{user.email}' o con el mismo numero de identificación."
         )
     except Exception as e:
         logging.error(f"Error al guardar un usuario: {e}")
@@ -56,22 +55,21 @@ def create_user(user: UserCreate, user_service: UserServiceDep):
 
 
 @user_router.put("/{user_id}", response_model=UserBase)
-def update_user(user_id: int, user: UserUpdate, user_service: UserServiceDep):
+def update_user(
+    user_id: int, user: UserUpdate, update_user_use_case: UpdateUserUseCaseDep
+):
     valid_user = _validate_user_to_update(user)
     if not valid_user:
         raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
-        updated_user = user_service.update_user(user_id, user)
-        if updated_user is None:
-            raise get_entity_not_found_exception(
-                f"Usuario con id {user_id} no encontrado"
-            )
-        return updated_user
+        return update_user_use_case.invoke(user_id, user)
     except IntegrityError:
+        print(traceback.format_exc())
         raise get_conflict_exception(
             f"Ya existe un usuario registrado con el email '{user.email}' "
         )
     except Exception as e:
+        print(traceback.format_exc())
         logging.error(f"Error al guardar un usuario: {e}")
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado, contacte con un administrador"
@@ -85,24 +83,6 @@ def delete_user(user_id: int, user_service: UserServiceDep):
         raise get_entity_not_found_exception(f"Usuario con id {user_id} no encontrado")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@user_router.get("/me/modules", response_model=UserWithModulesDTO)
-def get_current_user_modules(
-    current_user: CurrentUserDep,
-    get_user_with_modules_use_case: GetModulesWithUseCaseDep,
-):
-    if current_user.id is None:
-        raise get_credentials_exception()
-
-    try:
-        return get_user_with_modules_use_case.invoke(current_user)
-
-    except Exception as e:
-        logging.error(str(e))
-        raise get_internal_server_error_exception(
-            "Ocurrio un error inesperado al obtener los modulos del usuario actal"
-        )
 
 
 def _validate_user_to_create(user: UserCreate):
@@ -122,11 +102,13 @@ def _validate_user_to_create(user: UserCreate):
     if not user.identification.isdigit():
         raise get_bad_request_exception("La identificación debe contener solo números.")
 
+    if not user.roles:
+        user.roles = []
     return True
 
 
 def _validate_user_to_update(user: "UserUpdate"):
-    if not user.email and not user.name:
+    if not user.email and not user.name and user.roles is None:
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."
         )
@@ -139,5 +121,8 @@ def _validate_user_to_update(user: "UserUpdate"):
 
     if user.name and not user.name.strip():
         raise get_bad_request_exception("El nombre no puede estar vacío.")
+
+    if user.roles is not None and not isinstance(user.roles, list):
+        raise get_bad_request_exception("Roles debe ser una lista de números.")
 
     return True

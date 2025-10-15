@@ -1,9 +1,10 @@
+import logging
+from datetime import datetime
+
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from datetime import datetime
-from app.core.database.mongo.mongo import mongodb
 
-import logging
+from app.core.database.mongo.mongo import mongodb
 
 health_router = APIRouter(prefix="/health", tags=["Health"])
 

@@ -1,10 +1,10 @@
-from app.core.settings import settings
-from typing import Generator
-from typing import Annotated
+from typing import Annotated, Generator
 
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlmodel import Session
+
+from app.core.settings import settings
 
 engine = create_engine(settings.db_url)
 

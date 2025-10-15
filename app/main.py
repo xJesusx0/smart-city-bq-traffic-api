@@ -1,12 +1,15 @@
-from fastapi import FastAPI, APIRouter
-from fastapi.middleware.cors import CORSMiddleware
-from app.auth.routes.auth import auth_router
-from app.core.settings import settings
-from app.iam.routes.user import user_router
-from app.charts.routes.charts import charts_router
-
 import logging
+
 import uvicorn
+from fastapi import APIRouter, Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.auth.routes.auth import auth_router
+from app.charts.routes.charts import charts_router
+from app.core.dependencies import validate_token
+from app.core.settings import settings
+from app.iam.routes.role import role_router
+from app.iam.routes.user import user_router
 
 router = APIRouter(prefix="/api")
 
@@ -25,8 +28,9 @@ app.add_middleware(
 
 app.include_router(router)
 app.include_router(auth_router)
-app.include_router(user_router)
-app.include_router(charts_router)
+app.include_router(user_router, dependencies=[Depends(validate_token)])
+app.include_router(role_router, dependencies=[Depends(validate_token)])
+app.include_router(charts_router, dependencies=[Depends(validate_token)])
 
 
 def start():

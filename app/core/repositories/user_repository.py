@@ -1,7 +1,7 @@
-from app.core.models.user import UserCreate, UserUpdate
-from typing import Optional
-from app.core.models.user import DbUser
 from abc import ABC, abstractmethod
+from typing import Optional
+
+from app.core.models.user import DbUser, UserCreate, UserUpdate
 
 
 class UserRepository(ABC):

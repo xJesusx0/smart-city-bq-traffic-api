@@ -1,17 +1,18 @@
-from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 
-from app.core.dependencies import MongoDBDep
+from fastapi import APIRouter, HTTPException, Query
+
 from app.charts.models.charts import (
-    TimeLineResponse,
-    DatasetResponse,
-    LocationComparisonResponse,
     BarDatasetResponse,
-    VehicleTypesResponse,
-    PieDatasetResponse,
-    HourlyHeatmapResponse,
     DashboardSummaryResponse,
+    DatasetResponse,
+    HourlyHeatmapResponse,
+    LocationComparisonResponse,
+    PieDatasetResponse,
+    TimeLineResponse,
+    VehicleTypesResponse,
 )
+from app.core.dependencies import MongoDBDep
 
 charts_router = APIRouter(prefix="/api/charts", tags=["Charts"])
 
