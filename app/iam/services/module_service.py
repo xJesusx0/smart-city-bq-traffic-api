@@ -19,3 +19,15 @@ class ModuleService:
         Gets all modules by a list of IDs.
         """
         return self.module_repository.get_modules_by_ids(module_ids)
+
+    def get_all_modules(self) -> list[DbModule]:
+        """
+        Gets all modules.
+        """
+        return self.module_repository.get_all_modules()
+
+    def get_module_by_id(self, module_id: int) -> DbModule | None:
+        """
+        Gets a module by its ID.
+        """
+        return self.module_repository.get_module_by_id(module_id)
