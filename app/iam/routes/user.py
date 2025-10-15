@@ -108,7 +108,7 @@ def _validate_user_to_create(user: UserCreate):
 
 
 def _validate_user_to_update(user: "UserUpdate"):
-    if not user.email and not user.name and user.roles is None:
+    if not user.email and not user.name and user.roles is None and user.active is None:
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."
         )
