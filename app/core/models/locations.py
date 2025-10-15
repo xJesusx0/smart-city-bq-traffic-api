@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlmodel import Field
+from sqlmodel import Field, SQLModel
 
 from app.core.models.base import SmartCityBqBaseModel
 
@@ -18,9 +18,6 @@ class DbLocation(LocationBase, table=True):
 
 class LocationCreate(LocationBase):
     pass
-
-
-from sqlmodel import SQLModel
 
 
 class LocationUpdate(SQLModel):
