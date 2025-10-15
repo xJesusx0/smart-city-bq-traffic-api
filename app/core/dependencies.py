@@ -39,6 +39,7 @@ from app.iam.services.user_service import UserService
 from app.iam.usecases.create_role import CreateRoleUseCase
 from app.iam.usecases.create_user import CreateUserUseCase
 from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
+from app.iam.usecases.get_users_with_roles import GetUsersWithRolesUseCase
 from app.iam.usecases.update_role import UpdateRoleUseCase
 from app.iam.usecases.update_user import UpdateUserUseCase
 from app.traffic.services.location_service import LocationService
@@ -144,6 +145,13 @@ def get_get_user_with_modules_use_case(
     return GetUserWithModulesUseCase(user_service, module_service, role_service)
 
 
+def get_get_users_with_roles_use_case(
+    user_service: UserServiceDep,
+    role_service: RoleServiceDep,
+) -> GetUsersWithRolesUseCase:
+    return GetUsersWithRolesUseCase(user_service, role_service)
+
+
 def get_create_user_use_case(
     user_service: UserServiceDep,
     role_service: RoleServiceDep,
@@ -178,6 +186,9 @@ def get_update_role_use_case(
 
 GetModulesWithUseCaseDep = Annotated[
     GetUserWithModulesUseCase, Depends(get_get_user_with_modules_use_case)
+]
+GetUsersWithRolesUseCaseDep = Annotated[
+    GetUsersWithRolesUseCase, Depends(get_get_users_with_roles_use_case)
 ]
 CreateUserUseCaseDep = Annotated[CreateUserUseCase, Depends(get_create_user_use_case)]
 UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]
