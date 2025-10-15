@@ -17,3 +17,17 @@ class ModuleRepository(ABC):
         Retrieves a list of modules based on a list of module IDs.
         """
         pass
+
+    @abstractmethod
+    def get_all_modules(self) -> list[DbModule]:
+        """
+        Retrieves all modules.
+        """
+        pass
+
+    @abstractmethod
+    def get_module_by_id(self, module_id: int) -> DbModule | None:
+        """
+        Retrieves a module by its ID.
+        """
+        pass
