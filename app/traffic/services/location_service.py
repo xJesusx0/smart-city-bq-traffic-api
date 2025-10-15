@@ -1,4 +1,4 @@
-from app.core.models.locations import LocationCreate, LocationUpdate, DbLocation
+from app.core.models.locations import DbLocation, LocationCreate, LocationUpdate
 from app.core.repositories.location_repository import LocationRepository
 
 

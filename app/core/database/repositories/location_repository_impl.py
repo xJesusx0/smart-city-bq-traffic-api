@@ -23,7 +23,9 @@ class LocationRepositoryImpl(LocationRepository):
 
     def get_all_locations_by_active(self, active: bool) -> list[DbLocation]:
         return list(
-            self.session.exec(select(DbLocation).where(DbLocation.active == active)).all()
+            self.session.exec(
+                select(DbLocation).where(DbLocation.active == active)
+            ).all()
         )
 
     def update_location(

@@ -31,7 +31,6 @@ from app.core.repositories.user_repository import UserRepository
 from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import settings
-from app.traffic.services.location_service import LocationService
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
@@ -42,6 +41,7 @@ from app.iam.usecases.create_user import CreateUserUseCase
 from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
 from app.iam.usecases.update_role import UpdateRoleUseCase
 from app.iam.usecases.update_user import UpdateUserUseCase
+from app.traffic.services.location_service import LocationService
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -84,9 +84,7 @@ UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
 UserRoleRepoDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]
-ModuleRoleRepoDep = Annotated[
-    ModuleRoleRepository, Depends(get_module_role_repository)
-]
+ModuleRoleRepoDep = Annotated[ModuleRoleRepository, Depends(get_module_role_repository)]
 LocationRepoDep = Annotated[LocationRepository, Depends(get_location_repository)]
 
 MongoDBDep = Annotated[MongoDB, Depends(get_mongo_db)]

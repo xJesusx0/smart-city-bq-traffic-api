@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, Response, status
 from sqlalchemy.exc import IntegrityError
 
 from app.core.dependencies import LocationServiceDep
@@ -37,9 +37,7 @@ def create_location(location: LocationCreate, location_service: LocationServiceD
 
 
 @location_router.get("", response_model=list[LocationBase])
-def get_all_locations(
-    location_service: LocationServiceDep, active: bool | None = None
-):
+def get_all_locations(location_service: LocationServiceDep, active: bool | None = None):
     return location_service.get_all_locations(active=active)
 
 
