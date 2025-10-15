@@ -9,6 +9,9 @@ from app.auth.services.auth_service import AuthService
 from app.auth.services.google_auth_service import GoogleAuthService
 from app.core.database.connection import SessionDep
 from app.core.database.mongo.mongo import MongoDB, mongodb
+from app.core.database.repositories.location_repository_impl import (
+    LocationRepositoryImpl,
+)
 from app.core.database.repositories.module_repository_impl import ModuleRepositoryImpl
 from app.core.database.repositories.module_role_repository_impl import (
     ModuleRoleRepositoryImpl,
@@ -20,6 +23,7 @@ from app.core.database.repositories.user_role_repository_impl import (
 )
 from app.core.exceptions import get_credentials_exception
 from app.core.models.user import DbUser
+from app.core.repositories.location_repository import LocationRepository
 from app.core.repositories.module_repository import ModuleRepository
 from app.core.repositories.module_role_repository import ModuleRoleRepository
 from app.core.repositories.role_repository import RoleRepository
@@ -27,6 +31,7 @@ from app.core.repositories.user_repository import UserRepository
 from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import settings
+from app.traffic.services.location_service import LocationService
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
@@ -41,6 +46,7 @@ from app.iam.usecases.update_user import UpdateUserUseCase
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
 ACCESS_TOKEN_EXPIRE_DAYS = settings.jwt_expiration_time
+
 
 # --- Repositories
 
@@ -65,6 +71,10 @@ def get_module_role_repository(session: SessionDep) -> ModuleRoleRepository:
     return ModuleRoleRepositoryImpl(session)
 
 
+def get_location_repository(session: SessionDep) -> LocationRepository:
+    return LocationRepositoryImpl(session)
+
+
 async def get_mongo_db() -> MongoDB:
     await mongodb.ensure_connection()
     return mongodb
@@ -74,7 +84,10 @@ UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 ModuleRepoDep = Annotated[ModuleRepository, Depends(get_module_repository)]
 RoleRepoDeb = Annotated[RoleRepository, Depends(get_role_repository)]
 UserRoleRepoDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]
-ModuleRoleRepoDep = Annotated[ModuleRoleRepository, Depends(get_module_role_repository)]
+ModuleRoleRepoDep = Annotated[
+    ModuleRoleRepository, Depends(get_module_role_repository)
+]
+LocationRepoDep = Annotated[LocationRepository, Depends(get_location_repository)]
 
 MongoDBDep = Annotated[MongoDB, Depends(get_mongo_db)]
 # --- Services
@@ -110,12 +123,17 @@ def get_module_role_service(
     return ModuleRoleService(module_role_repository=module_role_repository)
 
 
+def get_location_service(location_repository: LocationRepoDep) -> LocationService:
+    return LocationService(location_repository=location_repository)
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
 RoleServiceDep = Annotated[RoleService, Depends(get_role_service)]
 UserRoleServiceDep = Annotated[UserRoleService, Depends(get_user_role_service)]
 ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_service)]
+LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 
 

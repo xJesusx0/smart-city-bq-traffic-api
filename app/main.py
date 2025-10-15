@@ -8,6 +8,7 @@ from app.auth.routes.auth import auth_router
 from app.charts.routes.charts import charts_router
 from app.core.dependencies import validate_token
 from app.core.settings import settings
+from app.traffic.routes.location import location_router
 from app.iam.routes.module import module_router
 from app.iam.routes.role import role_router
 from app.iam.routes.user import user_router
@@ -32,6 +33,7 @@ app.include_router(auth_router)
 app.include_router(user_router, dependencies=[Depends(validate_token)])
 app.include_router(role_router, dependencies=[Depends(validate_token)])
 app.include_router(module_router, dependencies=[Depends(validate_token)])
+app.include_router(location_router, dependencies=[Depends(validate_token)])
 app.include_router(charts_router, dependencies=[Depends(validate_token)])
 
 
