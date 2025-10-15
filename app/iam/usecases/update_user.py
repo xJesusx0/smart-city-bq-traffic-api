@@ -47,4 +47,10 @@ class UpdateUserUseCase:
             self.user_role_service.sync_user_roles(user_id, user_to_update.roles)
 
         # Return user with updated data
-        return self.user_service.get_user_by_id(user_id)
+        updated_user = self.user_service.get_user_by_id(user_id)
+        if not updated_user:
+            raise get_entity_not_found_exception(
+                f"Usuario con id {user_id} no encontrado"
+            )
+
+        return updated_user
