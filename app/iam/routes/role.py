@@ -57,7 +57,12 @@ def create_role(role: RoleCreate, create_role_use_case: CreateRoleUseCaseDep):
 def update_role(
     role_id: int, role: RoleUpdate, update_role_use_case: UpdateRoleUseCaseDep
 ):
-    if not role.name and not role.description and role.modules is None:
+    if (
+        not role.name
+        and not role.description
+        and role.modules is None
+        and role.active is None
+    ):
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."
         )

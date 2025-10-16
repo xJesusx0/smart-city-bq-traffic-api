@@ -22,3 +22,4 @@ class RoleUpdate(SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
     modules: Optional[list[int]] = None
+    active: Optional[bool] = None
