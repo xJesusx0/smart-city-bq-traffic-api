@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.dependencies import (
     CreateUserUseCaseDep,
+    GetUsersWithRolesUseCaseDep,
     UpdateUserUseCaseDep,
     UserServiceDep,
 )
@@ -18,6 +19,7 @@ from app.core.exceptions import (
 )
 from app.core.models.user import UserBase, UserCreate, UserUpdate
 from app.core.validations import is_valid_email
+from app.iam.dtos.user_with_roles import UserWithRolesDTO
 
 user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 
@@ -25,6 +27,14 @@ user_router = APIRouter(prefix="/api/iam/users", tags=["users"])
 @user_router.get("", response_model=list[UserBase])
 def get_all_users(user_service: UserServiceDep, active: bool | None = None):
     return user_service.get_all_users(active=active)
+
+
+@user_router.get("/with-roles", response_model=list[UserWithRolesDTO])
+def get_all_users_with_roles(
+    get_users_with_roles_use_case: GetUsersWithRolesUseCaseDep,
+    active: bool | None = None,
+):
+    return get_users_with_roles_use_case.invoke(active=active)
 
 
 @user_router.get("/{user_id}", response_model=UserBase)
@@ -108,7 +118,7 @@ def _validate_user_to_create(user: UserCreate):
 
 
 def _validate_user_to_update(user: "UserUpdate"):
-    if not user.email and not user.name and user.roles is None:
+    if not user.email and not user.name and user.roles is None and user.active is None:
         raise get_bad_request_exception(
             "Debes enviar al menos un campo para actualizar."
         )

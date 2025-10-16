@@ -29,3 +29,10 @@ class UserRoleRepository(ABC):
         Removes all roles from a user.
         """
         pass
+
+    @abstractmethod
+    def sync_user_roles(self, user_id: int, role_ids: list[int]) -> None:
+        """
+        Synchronizes the roles of a user with the given list of role IDs.
+        """
+        pass

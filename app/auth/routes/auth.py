@@ -45,6 +45,9 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if not user.active:
+        raise get_credentials_exception("El usuario se encuentra inactivo")
+
     token = create_access_token(data={"sub": user.email})
 
     return Token(access_token=token, token_type="bearer")
@@ -68,6 +71,9 @@ def oauth_google_login(
 
         if user is None:
             raise get_credentials_exception("Credenciales de autenticacion invalidas")
+
+        if not user.active:
+            raise get_credentials_exception("El usuario se encuentra inactivo")
 
         token = create_access_token(data={"sub": user.email})
 
