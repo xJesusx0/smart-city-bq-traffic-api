@@ -38,6 +38,7 @@ from app.iam.services.user_role_service import UserRoleService
 from app.iam.services.user_service import UserService
 from app.iam.usecases.create_role import CreateRoleUseCase
 from app.iam.usecases.create_user import CreateUserUseCase
+from app.iam.usecases.get_roles_with_modules import GetRolesWithModulesUseCase
 from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
 from app.iam.usecases.get_users_with_roles import GetUsersWithRolesUseCase
 from app.iam.usecases.update_role import UpdateRoleUseCase
@@ -104,8 +105,13 @@ def get_user_service(user_repository: UserRepoDep) -> UserService:
     return UserService(user_repository=user_repository)
 
 
-def get_module_service(module_repository: ModuleRepoDep) -> ModuleService:
-    return ModuleService(module_repository=module_repository)
+def get_module_service(
+    module_repository: ModuleRepoDep, module_role_repository: ModuleRoleRepoDep
+) -> ModuleService:
+    return ModuleService(
+        module_repository=module_repository,
+        module_role_repository=module_role_repository,
+    )
 
 
 def get_role_service(role_repository: RoleRepoDeb) -> RoleService:
@@ -184,11 +190,21 @@ def get_update_role_use_case(
     return UpdateRoleUseCase(role_service, module_service, module_role_service)
 
 
+def get_get_roles_with_modules_use_case(
+    role_service: RoleServiceDep,
+    module_service: ModuleServiceDep,
+) -> GetRolesWithModulesUseCase:
+    return GetRolesWithModulesUseCase(role_service, module_service)
+
+
 GetModulesWithUseCaseDep = Annotated[
     GetUserWithModulesUseCase, Depends(get_get_user_with_modules_use_case)
 ]
 GetUsersWithRolesUseCaseDep = Annotated[
     GetUsersWithRolesUseCase, Depends(get_get_users_with_roles_use_case)
+]
+GetRolesWithModulesUseCaseDep = Annotated[
+    GetRolesWithModulesUseCase, Depends(get_get_roles_with_modules_use_case)
 ]
 CreateUserUseCaseDep = Annotated[CreateUserUseCase, Depends(get_create_user_use_case)]
 UpdateUserUseCaseDep = Annotated[UpdateUserUseCase, Depends(get_update_user_use_case)]

@@ -17,6 +17,24 @@ class ModuleRoleRepositoryImpl(ModuleRoleRepository):
         self.session.add_all(new_module_roles)
         self.session.commit()
 
+    def get_module_ids_map_by_role_ids(
+        self, role_ids: list[int]
+    ) -> dict[int, list[int]]:
+        if not role_ids:
+            return {}
+
+        statement = select(DbModuleRole).where(DbModuleRole.role_id.in_(role_ids))  # type: ignore
+        rows = self.session.exec(statement).all()
+
+        result: dict[int, list[int]] = {}
+        for row in rows:
+            # Only include active relations if the model has an active flag
+            if hasattr(row, "active") and not getattr(row, "active"):
+                continue
+            result.setdefault(row.role_id, []).append(row.module_id)
+
+        return result
+
     def sync_modules_for_role(self, role_id: int, module_ids: list[int]) -> None:
         current_module_roles = self.session.exec(
             select(DbModuleRole).where(DbModuleRole.role_id == role_id)

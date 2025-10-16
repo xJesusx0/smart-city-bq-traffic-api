@@ -15,3 +15,12 @@ class ModuleRoleRepository(ABC):
         Synchronizes the modules of a role with the given list of module IDs.
         """
         pass
+
+    @abstractmethod
+    def get_module_ids_map_by_role_ids(
+        self, role_ids: list[int]
+    ) -> dict[int, list[int]]:
+        """
+        Returns a mapping from role_id to the list of module_ids associated to it.
+        """
+        pass
