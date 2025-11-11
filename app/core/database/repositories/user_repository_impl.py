@@ -1,4 +1,5 @@
 from datetime import datetime
+from re import U
 from typing import Optional, Sequence
 
 from sqlmodel import Session, select
@@ -79,3 +80,24 @@ class UserRepositoryImpl(UserRepository):
         self.session.refresh(db_user)
 
         return db_user
+
+    def get_user_by_change_password_uuid(
+        self, change_password_uuid: str
+    ) -> Optional[DbUser]:
+        must_change_password = True
+        statement = (
+            select(DbUser)
+            .where(DbUser.update_password_uuid == change_password_uuid)
+            .where(DbUser.must_change_password == must_change_password)
+        )
+
+        user = self.session.exec(statement).first()
+        return user
+
+    def update_password(self, user_id: int, password: str) -> None:
+        user = self.get_user_by_id(user_id)
+        
+        if user and user.must_change_password:
+            user.password = password
+            user.must_change_password = False
+            self.session.commit()
