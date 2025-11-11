@@ -64,7 +64,7 @@ async def create_user(
                 "No se pudo generar un uuid de cambio de contraseña"
             )
 
-        await email_service.send_email(
+        await email_service.send_welcome_email(
             recipient=new_user.email,
             full_name=new_user.name,
             token=new_user.update_password_uuid,

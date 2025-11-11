@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     mail_server: str = ""
     template_folder: str = ""
     mail_port: int = 587
+    change_password_url: str = ""
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
