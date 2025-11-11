@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.dependencies import (
     CreateUserUseCaseDep,
+    EmailServiceDep,
     GetUsersWithRolesUseCaseDep,
     UpdateUserUseCaseDep,
     UserServiceDep,
@@ -47,13 +48,31 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
 
 
 @user_router.post("", status_code=status.HTTP_201_CREATED, response_model=UserBase)
-def create_user(user: UserCreate, create_user_use_case: CreateUserUseCaseDep):
+async def create_user(
+    user: UserCreate,
+    create_user_use_case: CreateUserUseCaseDep,
+    email_service: EmailServiceDep,
+):
     valid_user = _validate_user_to_create(user)
     if not valid_user:
         raise get_bad_request_exception("Datos de usuario inválidos.")
     try:
-        return create_user_use_case.invoke(user)
+        new_user = create_user_use_case.invoke(user)
+
+        if new_user.update_password_uuid is None:
+            raise get_internal_server_error_exception(
+                "No se pudo generar un uuid de cambio de contraseña"
+            )
+
+        await email_service.send_welcome_email(
+            recipient=new_user.email,
+            full_name=new_user.name,
+            token=new_user.update_password_uuid,
+        )
+
+        return user
     except IntegrityError:
+        print(traceback.print_exc())
         raise get_conflict_exception(
             f"Ya existe un usuario registrado con el email '{user.email}' o con el mismo numero de identificación."
         )
@@ -96,17 +115,12 @@ def delete_user(user_id: int, user_service: UserServiceDep):
 
 
 def _validate_user_to_create(user: UserCreate):
-    if not user.email or not user.name or not user.identification or not user.password:
+    if not user.email or not user.name or not user.identification:
         raise get_bad_request_exception("Todos los campos son obligatorios.")
 
     if not is_valid_email(user.email):
         raise get_bad_request_exception(
             "El correo electrónico no tiene un formato válido."
-        )
-
-    if len(user.password) < 8:
-        raise get_bad_request_exception(
-            "La contraseña debe tener al menos 8 caracteres."
         )
 
     if not user.identification.isdigit():

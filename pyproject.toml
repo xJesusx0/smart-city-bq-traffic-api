@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "bcrypt>=5.0.0",
     "dotenv>=0.9.9",
+    "fastapi-mail>=1.5.8",
     "fastapi[standard]>=0.117.1",
     "google-auth>=2.41.1",
     "google-auth-httplib2>=0.2.0",
