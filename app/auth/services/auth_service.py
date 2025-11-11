@@ -12,10 +12,13 @@ class AuthService:
 
     def authenticate_user(self, username: str, password: str) -> DbUser | None:
         user = self.user_repository.get_user_by_email(username)
-        if not user:
+        if not user or not user.active:
             return None
 
-        if not user.password:
+        if not user.password or not user.password.strip():
+            return None
+
+        if user.must_change_password:
             return None
 
         if verify(password, user.password):
