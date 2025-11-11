@@ -54,6 +54,9 @@ class UserRepositoryImpl(UserRepository):
         db_user = DbUser.model_validate(user)
         db_user.creation_date = datetime.now()
         db_user.active = True
+        db_user.must_change_password = True
+        db_user.password = ""
+
         self.session.add(db_user)
         self.session.commit()
         self.session.refresh(db_user)
