@@ -39,15 +39,19 @@ class AuthService:
             print(traceback.format_exc())
             return None
 
-    def change_password(self, change_password_uuid: str, password: str) -> DbUser | None:
+    def change_password(
+        self, change_password_uuid: str, password: str
+    ) -> DbUser | None:
         try:
-            user = self.user_repository.get_user_by_change_password_uuid(change_password_uuid)
-    
+            user = self.user_repository.get_user_by_change_password_uuid(
+                change_password_uuid
+            )
+
             if not user or not user.id:
                 return None
-            
+
             hashed_password = encrypt(password)
-        
+
             self.user_repository.update_password(user.id, hashed_password)
 
             return self.authenticate_user(user.email, password)

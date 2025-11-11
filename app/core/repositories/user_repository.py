@@ -34,7 +34,9 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_user_by_change_password_uuid(self, change_password_uuid: str) -> Optional[DbUser]:
+    def get_user_by_change_password_uuid(
+        self, change_password_uuid: str
+    ) -> Optional[DbUser]:
         pass
 
     @abstractmethod

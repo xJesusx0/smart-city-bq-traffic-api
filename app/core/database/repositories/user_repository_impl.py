@@ -1,5 +1,4 @@
 from datetime import datetime
-from re import U
 from typing import Optional, Sequence
 
 from sqlmodel import Session, select
@@ -96,7 +95,7 @@ class UserRepositoryImpl(UserRepository):
 
     def update_password(self, user_id: int, password: str) -> None:
         user = self.get_user_by_id(user_id)
-        
+
         if user and user.must_change_password:
             user.password = password
             user.must_change_password = False

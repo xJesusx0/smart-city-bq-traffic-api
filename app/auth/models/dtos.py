@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from app.core.models.module import ModuleBase
 from app.core.models.role import RoleBase
 from app.core.models.user import UserBase

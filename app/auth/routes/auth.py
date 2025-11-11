@@ -21,7 +21,7 @@ from app.core.exceptions import (
     get_credentials_exception,
     get_internal_server_error_exception,
 )
-from app.core.models.user import DbUser, UserBase
+from app.core.models.user import DbUser
 from app.core.security.jwt_service import create_access_token
 
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -41,6 +41,7 @@ def login(
 
     user = auth_service.authenticate_user(form_data.username, form_data.password)
     return validate_and_create_token(user)
+
 
 @auth_router.post("/login/google")
 def oauth_google_login(
@@ -95,7 +96,7 @@ def change_password(data: ChangePasswordDTO, auth_service: AuthServiceDep) -> To
 
     user = auth_service.change_password(data.token, data.password)
     return validate_and_create_token(user)
-   
+
 
 def validate_and_create_token(user: Optional[DbUser]) -> Token:
     if user is None:

@@ -2,6 +2,7 @@ import traceback
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import EmailStr
+
 from app.core.settings import settings
 
 
