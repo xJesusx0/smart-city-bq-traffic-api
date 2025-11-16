@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     change_password_url: str = ""
 
     geo_info_service_url: str = ""
+    geo_info_service_api_key: str = ""
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
