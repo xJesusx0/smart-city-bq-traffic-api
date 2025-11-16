@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     mail_port: int = 587
     change_password_url: str = ""
 
+    geo_info_service_url: str = ""
+
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def build_allowed_hosts(cls, value: str | list[str]) -> str | list[str]:

@@ -46,6 +46,8 @@ from app.iam.usecases.get_users_with_roles import GetUsersWithRolesUseCase
 from app.iam.usecases.update_role import UpdateRoleUseCase
 from app.iam.usecases.update_user import UpdateUserUseCase
 from app.traffic.services.location_service import LocationService
+from app.geo.services.geo_info_service import GeoInfoService
+
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -137,6 +139,8 @@ def get_location_service(location_repository: LocationRepoDep) -> LocationServic
 def get_email_service() -> EmailService:
     return EmailService(ConnectionConfig(**email_settings.model_dump()))
 
+def get_geo_info_service() -> GeoInfoService:
+    return GeoInfoService(base_url=settings.geo_info_service_url)
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
@@ -147,7 +151,7 @@ ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_serv
 LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 EmailServiceDep = Annotated[EmailService, Depends(get_email_service)]
-
+GeoInfoServiceDep = Annotated[GeoInfoService, Depends(get_geo_info_service)]
 
 # --- Usecases
 def get_get_user_with_modules_use_case(
