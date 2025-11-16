@@ -33,6 +33,7 @@ from app.core.repositories.user_repository import UserRepository
 from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
 from app.core.settings import email_settings, settings
+from app.geo.services.geo_info_service import GeoInfoService
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
@@ -138,6 +139,10 @@ def get_email_service() -> EmailService:
     return EmailService(ConnectionConfig(**email_settings.model_dump()))
 
 
+def get_geo_info_service() -> GeoInfoService:
+    return GeoInfoService(base_url=settings.geo_info_service_url, api_key=settings.geo_info_service_api_key)
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
@@ -147,6 +152,7 @@ ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_serv
 LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 EmailServiceDep = Annotated[EmailService, Depends(get_email_service)]
+GeoInfoServiceDep = Annotated[GeoInfoService, Depends(get_geo_info_service)]
 
 
 # --- Usecases
