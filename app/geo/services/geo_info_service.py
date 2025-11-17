@@ -18,7 +18,9 @@ class GeoInfoService:
             data = response.json()
             return NeighborhoodInfo(**data)
         elif response.status_code == 403:
-            raise get_forbidden_exception(f"Acceso denegado a la API de información geográfica")
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
         else:
             return None
 

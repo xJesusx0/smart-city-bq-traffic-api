@@ -140,7 +140,10 @@ def get_email_service() -> EmailService:
 
 
 def get_geo_info_service() -> GeoInfoService:
-    return GeoInfoService(base_url=settings.geo_info_service_url, api_key=settings.geo_info_service_api_key)
+    return GeoInfoService(
+        base_url=settings.geo_info_service_url,
+        api_key=settings.geo_info_service_api_key,
+    )
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
