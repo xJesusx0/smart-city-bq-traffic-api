@@ -1,3 +1,5 @@
+import uuid
+
 from app.core.exceptions import get_bad_request_exception
 from app.core.models.user import UserBase, UserCreate
 from app.iam.services.role_service import RoleService
@@ -24,8 +26,12 @@ class CreateUserUseCase:
                 "Uno o mas de los roles seleccionados son invalidos."
             )
 
+        update_password_uuid = str(uuid.uuid4())
+        user_to_create.update_password_uuid = update_password_uuid
+
         # Create user
         created_user = self.user_service.create_user(user_to_create)
+        print(created_user)
         # Assign roles to user
         if not created_user or not created_user.id:
             raise get_bad_request_exception("No se pudo crear el usuario.")

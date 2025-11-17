@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.core.email.models.email import EmailSettings
+
 load_dotenv()
 
 
@@ -29,6 +31,18 @@ class Settings(BaseSettings):
 
     google_client_id: str = ""
 
+    mail_username: str = ""
+    mail_password: str = ""
+    mail_from: str = ""
+    mail_from_name: str = ""
+    mail_server: str = ""
+    template_folder: str = ""
+    mail_port: int = 587
+    change_password_url: str = ""
+
+    geo_info_service_url: str = ""
+    geo_info_service_api_key: str = ""
+
     @field_validator("allowed_hosts", mode="before")
     @classmethod
     def build_allowed_hosts(cls, value: str | list[str]) -> str | list[str]:
@@ -42,3 +56,12 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+email_settings = EmailSettings(
+    MAIL_USERNAME=settings.mail_username,
+    MAIL_PASSWORD=settings.mail_password,
+    MAIL_FROM=settings.mail_from,
+    MAIL_PORT=settings.mail_port,
+    MAIL_SERVER=settings.mail_server,
+    MAIL_FROM_NAME=settings.mail_from_name,
+    TEMPLATE_FOLDER=settings.template_folder,
+)

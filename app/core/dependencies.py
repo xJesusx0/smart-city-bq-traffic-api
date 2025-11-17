@@ -3,6 +3,7 @@ from typing import Annotated, Any
 
 import jwt
 from fastapi import Depends, HTTPException
+from fastapi_mail import ConnectionConfig
 from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService
@@ -21,6 +22,7 @@ from app.core.database.repositories.user_repository_impl import UserRepositoryIm
 from app.core.database.repositories.user_role_repository_impl import (
     UserRoleRepositoryImpl,
 )
+from app.core.email.services.email_service import EmailService
 from app.core.exceptions import get_credentials_exception
 from app.core.models.user import DbUser
 from app.core.repositories.location_repository import LocationRepository
@@ -30,7 +32,8 @@ from app.core.repositories.role_repository import RoleRepository
 from app.core.repositories.user_repository import UserRepository
 from app.core.repositories.user_role_repository import UserRoleRepository
 from app.core.security.security import oauth2_scheme
-from app.core.settings import settings
+from app.core.settings import email_settings, settings
+from app.geo.services.geo_info_service import GeoInfoService
 from app.iam.services.module_role_service import ModuleRoleService
 from app.iam.services.module_service import ModuleService
 from app.iam.services.role_service import RoleService
@@ -132,6 +135,17 @@ def get_location_service(location_repository: LocationRepoDep) -> LocationServic
     return LocationService(location_repository=location_repository)
 
 
+def get_email_service() -> EmailService:
+    return EmailService(ConnectionConfig(**email_settings.model_dump()))
+
+
+def get_geo_info_service() -> GeoInfoService:
+    return GeoInfoService(
+        base_url=settings.geo_info_service_url,
+        api_key=settings.geo_info_service_api_key,
+    )
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
@@ -140,6 +154,8 @@ UserRoleServiceDep = Annotated[UserRoleService, Depends(get_user_role_service)]
 ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_service)]
 LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
+EmailServiceDep = Annotated[EmailService, Depends(get_email_service)]
+GeoInfoServiceDep = Annotated[GeoInfoService, Depends(get_geo_info_service)]
 
 
 # --- Usecases

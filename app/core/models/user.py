@@ -9,18 +9,12 @@ class UserBase(SmartCityBqBaseModel):
     email: str = Field(index=True, unique=True)
     name: str = Field()
     identification: str = Field(index=True, unique=True)
+    must_change_password: bool | None = Field(default=False)
+    update_password_uuid: str | None = Field(default=None, unique=True)
 
     @classmethod
     def map_from_db(cls, db_user: "DbUser") -> "UserBase":
-        return UserBase(
-            id=db_user.id,
-            email=db_user.email,
-            name=db_user.name,
-            identification=db_user.identification,
-            creation_date=db_user.creation_date,
-            active=db_user.active,
-            update_date=db_user.update_date,
-        )
+        return UserBase(**db_user.model_dump())
 
 
 class UserCreate(UserBase):

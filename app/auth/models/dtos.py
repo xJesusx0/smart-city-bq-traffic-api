@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 from app.core.models.module import ModuleBase
 from app.core.models.role import RoleBase
 from app.core.models.user import UserBase
@@ -10,3 +12,8 @@ class UserWithModulesDTO(UserBase):
 
     modules: list[ModuleBase]
     roles: list[RoleBase]
+
+
+class ChangePasswordDTO(BaseModel):
+    token: str
+    password: str
