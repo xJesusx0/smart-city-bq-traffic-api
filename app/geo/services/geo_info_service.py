@@ -1,7 +1,11 @@
 import httpx
 
 from app.core.exceptions import get_forbidden_exception
-from app.geo.models.geo_info_service_models import NeighborhoodInfo
+from app.geo.models.geo_info_service_models import (
+    Intersection,
+    NeighborhoodInfo,
+    TrafficLight,
+)
 
 
 class GeoInfoService:
@@ -15,8 +19,8 @@ class GeoInfoService:
         url = f"{self.base_url}/api/v1/neighborhoods/point?latitude={latitude}&longitude={longitude}"
         response = await self.send_request(url)
         if response.status_code == 200:
-            data = response.json()
-            return NeighborhoodInfo(**data)
+            data: NeighborhoodInfo = response.json()
+            return data
         elif response.status_code == 403:
             raise get_forbidden_exception(
                 "Acceso denegado a la API de información geográfica"
@@ -24,7 +28,67 @@ class GeoInfoService:
         else:
             return None
 
-    async def send_request(self, url: str) -> httpx.Response:
+    async def get_intersection_by_point(
+        self, latitude: float, longitude: float, radius: int
+    ) -> list[Intersection] | None:
+        url = f"{self.base_url}/api/v1/intersections?latitude={latitude}&longitude={longitude}&radius={radius}&limit=10"
+        response = await self.send_request(url)
+        if response.status_code == 200:
+            data: list = response.json()
+            return [Intersection(**item) for item in data]
+        elif response.status_code == 403:
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
+        else:
+            return None
+
+    async def get_traffic_lights(
+        self,
+        name: str | None = None,
+        intersection_id: int | None = None,
+        longitude: float | None = None,
+        latitude: float | None = None,
+    ) -> list[TrafficLight] | None:
+        url = f"{self.base_url}/api/v1/traffic-lights"
+        params = {
+            "name": name,
+            "intersection_id": intersection_id,
+            "longitude": longitude,
+            "latitude": latitude,
+        }
+        # Filtrar parametros nulos para no enviarlos en la query string
+        params = {k: v for k, v in params.items() if v is not None}
+
+        response = await self.send_request(url, params=params)
+        if response.status_code == 200:
+            data: list = response.json()
+            return [TrafficLight(**item) for item in data]
+        elif response.status_code == 403:
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
+        else:
+            return None
+
+    async def get_traffic_light_by_id(self, traffic_light_id: int) -> TrafficLight | None:
+        url = f"{self.base_url}/api/v1/traffic-lights/{traffic_light_id}"
+        response = await self.send_request(url)
+        if response.status_code == 200:
+            data: dict = response.json()
+            return TrafficLight(**data)
+        elif response.status_code == 403:
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
+        else:
+            return None
+
+    async def send_request(
+        self, url: str, params: dict | None = None
+    ) -> httpx.Response:
         async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers={"x-api-key": self.api_key})
+            response = await client.get(
+                url, params=params, headers={"x-api-key": self.api_key}
+            )
             return response
