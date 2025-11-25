@@ -4,6 +4,8 @@ from app.core.exceptions import (
     get_bad_request_exception,
     get_conflict_exception,
     get_forbidden_exception,
+    get_internal_server_error_exception,
+    get_entity_not_found_exception,
 )
 from app.geo.models.geo_info_service_models import (
     CreateIntersectionDTO,
@@ -19,6 +21,38 @@ class GeoInfoService:
         self.base_url = base_url
         self.api_key = api_key
 
+    def _handle_error_response(self, response: httpx.Response) -> None:
+        """
+        Maneja las respuestas de error de la API externa.
+        
+        Formato esperado de error:
+        {
+            "message": "Descripción del error",
+            "error": "TipoDeError",
+            "statusCode": 400
+        }
+        """
+        try:
+            error_data = response.json()
+            error_message = error_data.get("message", "Error desconocido")
+        except Exception:
+            error_message = f"Error en la API externa: {response.status_code}"
+
+        if response.status_code == 400:
+            raise get_bad_request_exception(error_message)
+        elif response.status_code == 403:
+            raise get_forbidden_exception(error_message)
+        elif response.status_code == 404:
+            raise get_entity_not_found_exception(error_message)
+        elif response.status_code == 409:
+            raise get_conflict_exception(error_message)
+        elif response.status_code >= 500:
+            raise get_internal_server_error_exception(error_message)
+        else:
+            raise get_internal_server_error_exception(
+                f"Error inesperado de la API externa: {error_message}"
+            )
+
     async def get_neighborhood_by_point(
         self, latitude: float, longitude: float
     ) -> NeighborhoodInfo | None:
@@ -27,12 +61,8 @@ class GeoInfoService:
         if response.status_code == 200:
             data: NeighborhoodInfo = response.json()
             return data
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def get_intersection_by_point(
         self, latitude: float, longitude: float, radius: int
@@ -42,12 +72,8 @@ class GeoInfoService:
         if response.status_code == 200:
             data: list = response.json()
             return [Intersection(**item) for item in data]
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def get_traffic_lights(
         self,
@@ -70,12 +96,8 @@ class GeoInfoService:
         if response.status_code == 200:
             data: list = response.json()
             return [TrafficLight(**item) for item in data]
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def get_traffic_light_by_id(
         self, traffic_light_id: int
@@ -85,58 +107,30 @@ class GeoInfoService:
         if response.status_code == 200:
             data: dict = response.json()
             return TrafficLight(**data)
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def create_intersection(
         self, intersection_dto: CreateIntersectionDTO
-    ) -> Intersection | None:
+    ) -> Intersection:
         url = f"{self.base_url}/api/v1/intersections"
         response = await self.send_post_request(url, body=intersection_dto.dict())
         if response.status_code == 200 or response.status_code == 201:
             data: dict = response.json()
             return Intersection(**data)
-        elif response.status_code == 409:
-            raise get_conflict_exception(
-                response.json().get("detail", "Conflicto al crear la intersección")
-            )
-        elif response.status_code == 400:
-            raise get_bad_request_exception(
-                response.json().get("detail", "Datos inválidos")
-            )
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def create_traffic_light(
         self, traffic_light_dto: CreateTrafficLightDTO
-    ) -> TrafficLight | None:
+    ) -> TrafficLight:
         url = f"{self.base_url}/api/v1/traffic-lights"
         response = await self.send_post_request(url, body=traffic_light_dto.dict())
         if response.status_code == 200 or response.status_code == 201:
             data: dict = response.json()
             return TrafficLight(**data)
-        elif response.status_code == 409:
-            raise get_conflict_exception(
-                response.json().get("detail", "Conflicto al crear el semáforo")
-            )
-        elif response.status_code == 400:
-            raise get_bad_request_exception(
-                response.json().get("detail", "Datos inválidos")
-            )
-        elif response.status_code == 403:
-            raise get_forbidden_exception(
-                "Acceso denegado a la API de información geográfica"
-            )
         else:
-            return None
+            self._handle_error_response(response)
 
     async def send_request(
         self, url: str, params: dict | None = None
