@@ -55,7 +55,7 @@ class GeoInfoService:
 
     async def get_neighborhood_by_point(
         self, latitude: float, longitude: float
-    ) -> NeighborhoodInfo | None:
+    ) -> NeighborhoodInfo:
         url = f"{self.base_url}/api/v1/neighborhoods/point?latitude={latitude}&longitude={longitude}"
         response = await self.send_request(url)
         if response.status_code == 200:
@@ -66,7 +66,7 @@ class GeoInfoService:
 
     async def get_intersection_by_point(
         self, latitude: float, longitude: float, radius: int
-    ) -> list[Intersection] | None:
+    ) -> list[Intersection]:
         url = f"{self.base_url}/api/v1/intersections?latitude={latitude}&longitude={longitude}&radius={radius}&limit=10"
         response = await self.send_request(url)
         if response.status_code == 200:
