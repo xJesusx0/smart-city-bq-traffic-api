@@ -20,13 +20,13 @@ class NeighborhoodInfo(BaseModel):
 
 
 class Intersection(BaseModel):
-    intersection_id: int
-    street_a_id: int
-    street_a_name: str
-    street_b_id: int
-    street_b_name: str
-    distance_meters: float
-    geojson: Dict[str, Any]
+    id: int | None = None
+    street_a_id: int | None = None
+    street_a_name: str | None = None
+    street_b_id: int | None = None
+    street_b_name: str | None = None
+    distance_meters: float | None = None
+    geojson: Dict[str, Any] | None = None
 
 
 class CreateIntersectionDTO(BaseModel):

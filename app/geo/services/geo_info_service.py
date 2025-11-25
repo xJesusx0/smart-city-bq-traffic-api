@@ -1,6 +1,12 @@
+from app.geo.models.geo_info_service_models import CreateTrafficLightDTO
+from app.geo.models.geo_info_service_models import CreateIntersectionDTO
 import httpx
 
-from app.core.exceptions import get_forbidden_exception
+from app.core.exceptions import (
+    get_forbidden_exception,
+    get_conflict_exception,
+    get_bad_request_exception,
+)
 from app.geo.models.geo_info_service_models import (
     Intersection,
     NeighborhoodInfo,
@@ -84,11 +90,54 @@ class GeoInfoService:
         else:
             return None
 
+    async def create_intersection(self, intersection_dto: CreateIntersectionDTO) -> Intersection | None:
+        url = f"{self.base_url}/api/v1/intersections"
+        response = await self.send_post_request(url, body=intersection_dto.dict())
+        if response.status_code == 200 or response.status_code == 201:
+            data: dict = response.json()
+            return Intersection(**data)
+        elif response.status_code == 409:
+            raise get_conflict_exception(response.json().get("detail", "Conflicto al crear la intersección"))
+        elif response.status_code == 400:
+            raise get_bad_request_exception(response.json().get("detail", "Datos inválidos"))
+        elif response.status_code == 403:
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
+        else:
+            return None
+
+    async def create_traffic_light(self, traffic_light_dto: CreateTrafficLightDTO) -> TrafficLight | None:
+        url = f"{self.base_url}/api/v1/traffic-lights"
+        response = await self.send_post_request(url, body=traffic_light_dto.dict())
+        if response.status_code == 200 or response.status_code == 201:
+            data: dict = response.json()
+            return TrafficLight(**data)
+        elif response.status_code == 409:
+            raise get_conflict_exception(response.json().get("detail", "Conflicto al crear el semáforo"))
+        elif response.status_code == 400:
+            raise get_bad_request_exception(response.json().get("detail", "Datos inválidos"))
+        elif response.status_code == 403:
+            raise get_forbidden_exception(
+                "Acceso denegado a la API de información geográfica"
+            )
+        else:
+            return None
+
     async def send_request(
         self, url: str, params: dict | None = None
     ) -> httpx.Response:
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 url, params=params, headers={"x-api-key": self.api_key}
+            )
+            return response
+
+    async def send_post_request(
+        self, url: str, body: dict | None = None
+    ) -> httpx.Response:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url, json=body, headers={"x-api-key": self.api_key}
             )
             return response

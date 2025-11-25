@@ -1,3 +1,5 @@
+from app.geo.models.geo_info_service_models import CreateTrafficLightDTO
+from app.geo.models.geo_info_service_models import CreateIntersectionDTO
 from fastapi import APIRouter
 
 from app.core.dependencies import GeoInfoServiceDep
@@ -36,6 +38,27 @@ async def get_intersections_by_point(
         )
     return intersections
 
+@geo_router.post("/intersections")
+async def create_intersection(
+    intersection_dto: CreateIntersectionDTO, geo_info_service: GeoInfoServiceDep = GeoInfoServiceDep
+) -> Intersection:
+    intersection = await geo_info_service.create_intersection(intersection_dto)
+    if intersection is None:
+        raise get_entity_not_found_exception(
+            f"No se pudo crear la intersección"
+        )
+    return intersection
+
+@geo_router.post("/traffic-lights")
+async def create_traffic_light(
+    traffic_light_dto: CreateTrafficLightDTO, geo_info_service: GeoInfoServiceDep = GeoInfoServiceDep
+) -> TrafficLight:
+    traffic_light = await geo_info_service.create_traffic_light(traffic_light_dto)
+    if traffic_light is None:
+        raise get_entity_not_found_exception(
+            f"No se pudo crear el semáforo"
+        )
+    return traffic_light
 
 @geo_router.get("/traffic-lights")
 async def get_traffic_lights(
