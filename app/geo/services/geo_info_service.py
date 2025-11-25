@@ -3,9 +3,9 @@ import httpx
 from app.core.exceptions import (
     get_bad_request_exception,
     get_conflict_exception,
+    get_entity_not_found_exception,
     get_forbidden_exception,
     get_internal_server_error_exception,
-    get_entity_not_found_exception,
 )
 from app.geo.models.geo_info_service_models import (
     CreateIntersectionDTO,
@@ -24,7 +24,7 @@ class GeoInfoService:
     def _handle_error_response(self, response: httpx.Response) -> None:
         """
         Maneja las respuestas de error de la API externa.
-        
+
         Formato esperado de error:
         {
             "message": "Descripción del error",
