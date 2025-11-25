@@ -1,6 +1,10 @@
-from app.core.models.user import UserBase, UserCreate, UserUpdate
+from app.core.models.user import (
+    UserBase,
+    UserCreate,
+    UserCreateWithPassword,
+    UserUpdate,
+)
 from app.core.repositories.user_repository import UserRepository
-from app.core.security import encryption_service
 
 
 class UserService:
@@ -21,8 +25,8 @@ class UserService:
         return None
 
     def create_user(self, user: UserCreate) -> UserBase:
-        user.password = encryption_service.encrypt(user.password)
-        db_user = self.user_repository.create_user(user)
+        user_with_password = UserCreateWithPassword(**user.model_dump(), password="")
+        db_user = self.user_repository.create_user(user_with_password)
         return UserBase.map_from_db(db_user)
 
     def update_user(self, user_id: int, user: UserUpdate) -> UserBase | None:

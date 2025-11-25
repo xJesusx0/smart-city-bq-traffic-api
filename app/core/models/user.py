@@ -19,6 +19,9 @@ class UserBase(SmartCityBqBaseModel):
 
 class UserCreate(UserBase):
     roles: list[int]
+
+
+class UserCreateWithPassword(UserCreate):
     password: str
 
 

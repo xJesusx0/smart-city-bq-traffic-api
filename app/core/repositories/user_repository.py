@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.core.models.user import DbUser, UserCreate, UserUpdate
+from app.core.models.user import DbUser, UserCreateWithPassword, UserUpdate
 
 
 class UserRepository(ABC):
@@ -26,7 +26,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def create_user(self, user: UserCreate) -> DbUser:
+    def create_user(self, user: UserCreateWithPassword) -> DbUser:
         pass
 
     @abstractmethod

@@ -77,6 +77,7 @@ async def create_user(
             f"Ya existe un usuario registrado con el email '{user.email}' o con el mismo numero de identificación."
         )
     except Exception as e:
+        print(traceback.print_exc())
         logging.error(f"Error al guardar un usuario: {e}")
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado, contacte con un administrador"

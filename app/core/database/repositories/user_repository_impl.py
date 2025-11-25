@@ -3,7 +3,7 @@ from typing import Optional, Sequence
 
 from sqlmodel import Session, select
 
-from app.core.models.user import DbUser, UserCreate, UserUpdate
+from app.core.models.user import DbUser, UserCreateWithPassword, UserUpdate
 from app.core.repositories.user_repository import UserRepository
 
 
@@ -50,7 +50,7 @@ class UserRepositoryImpl(UserRepository):
 
         return user
 
-    def create_user(self, user: UserCreate) -> DbUser:
+    def create_user(self, user: UserCreateWithPassword) -> DbUser:
         db_user = DbUser.model_validate(user)
         db_user.creation_date = datetime.now()
         db_user.active = True
