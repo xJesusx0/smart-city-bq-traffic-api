@@ -26,8 +26,13 @@ class CreateUserUseCase:
                 "Uno o mas de los roles seleccionados son invalidos."
             )
 
-        update_password_uuid = str(uuid.uuid4())
-        user_to_create.update_password_uuid = update_password_uuid
+        if not user_to_create.external_login:
+            update_password_uuid = str(uuid.uuid4())
+            user_to_create.update_password_uuid = update_password_uuid
+            user_to_create.must_change_password = True
+        else:
+            user_to_create.update_password_uuid = None
+            user_to_create.must_change_password = False
 
         # Create user
         created_user = self.user_service.create_user(user_to_create)

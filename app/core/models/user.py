@@ -11,6 +11,7 @@ class UserBase(SmartCityBqBaseModel):
     identification: str = Field(index=True, unique=True)
     must_change_password: bool | None = Field(default=False)
     update_password_uuid: str | None = Field(default=None, unique=True)
+    external_login: bool = Field(default=False)
 
     @classmethod
     def map_from_db(cls, db_user: "DbUser") -> "UserBase":
