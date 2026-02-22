@@ -42,6 +42,8 @@ class Settings(BaseSettings):
 
     geo_info_service_url: str = ""
     geo_info_service_api_key: str = ""
+    ms_tenant_id: str = ""
+    ms_client_id: str = ""
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod

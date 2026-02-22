@@ -8,6 +8,7 @@ from jwt import InvalidTokenError
 
 from app.auth.services.auth_service import AuthService
 from app.auth.services.google_auth_service import GoogleAuthService
+from app.auth.services.microsoft_auth_service import MicrosoftAuthService
 from app.core.database.connection import SessionDep
 from app.core.database.mongo.mongo import MongoDB, mongodb
 from app.core.database.repositories.location_repository_impl import (
@@ -100,6 +101,12 @@ def get_google_auth_service() -> GoogleAuthService:
     return GoogleAuthService(client_id=settings.google_client_id)
 
 
+def get_microsoft_auth_service() -> MicrosoftAuthService:
+    return MicrosoftAuthService(
+        client_id=settings.ms_client_id, tenant_id=settings.ms_tenant_id
+    )
+
+
 def get_auth_service(user_repository: UserRepoDep) -> AuthService:
     return AuthService(user_repository=user_repository)
 
@@ -154,6 +161,9 @@ UserRoleServiceDep = Annotated[UserRoleService, Depends(get_user_role_service)]
 ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_service)]
 LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
+MicrosoftAuthServiceDep = Annotated[
+    MicrosoftAuthService, Depends(get_microsoft_auth_service)
+]
 EmailServiceDep = Annotated[EmailService, Depends(get_email_service)]
 GeoInfoServiceDep = Annotated[GeoInfoService, Depends(get_geo_info_service)]
 

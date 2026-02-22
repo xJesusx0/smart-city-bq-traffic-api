@@ -59,16 +59,17 @@ async def create_user(
     try:
         new_user = create_user_use_case.invoke(user)
 
-        if new_user.update_password_uuid is None:
-            raise get_internal_server_error_exception(
-                "No se pudo generar un uuid de cambio de contraseña"
-            )
+        if not new_user.external_login:
+            if new_user.update_password_uuid is None:
+                raise get_internal_server_error_exception(
+                    "No se pudo generar un uuid de cambio de contraseña"
+                )
 
-        await email_service.send_welcome_email(
-            recipient=new_user.email,
-            full_name=new_user.name,
-            token=new_user.update_password_uuid,
-        )
+            await email_service.send_welcome_email(
+                recipient=new_user.email,
+                full_name=new_user.name,
+                token=new_user.update_password_uuid,
+            )
 
         return user
     except IntegrityError:
