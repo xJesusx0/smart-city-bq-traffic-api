@@ -1,3 +1,5 @@
+from sqlalchemy import try_cast
+from app.core.dependencies import MicrosoftAuthServiceDep
 import logging
 import traceback
 from typing import Annotated, Optional
@@ -8,7 +10,7 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.models.dtos import ChangePasswordDTO, UserWithModulesDTO
-from app.auth.models.oauth_google import GoogleTokenRequest
+from app.auth.models.oauth import OauthTokenRequest
 from app.auth.models.token import Token
 from app.core.dependencies import (
     AuthServiceDep,
@@ -45,7 +47,7 @@ def login(
 
 @auth_router.post("/login/google")
 def oauth_google_login(
-    token_request: GoogleTokenRequest,
+    token_request: OauthTokenRequest,
     auth_service: AuthServiceDep,
     google_auth_service: GoogleAuthServiceDep,
 ) -> Token:
@@ -68,6 +70,34 @@ def oauth_google_login(
         print(traceback.format_exc())
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado al validar el token de Google"
+        )
+
+
+@auth_router.post("/login/microsoft")
+def oauth_microsoft_login(
+    token_request: OauthTokenRequest,
+    auth_service: AuthServiceDep,
+    microsoft_auth_service: MicrosoftAuthServiceDep
+) -> Token:
+    try:
+        print("Validando token de Microsoft...")
+        microsoft_user_info = microsoft_auth_service.get_user_info(token_request.token)
+
+        print("Token de Microsoft validado:", microsoft_user_info)
+        if microsoft_user_info is None:
+            raise get_credentials_exception("Token de microsoft inválido")
+
+        user = auth_service.authenticate_microsoft_user(microsoft_user_info)
+
+        return validate_and_create_token(user)
+
+    except ValueError:
+        print(traceback.format_exc())
+        raise get_credentials_exception("No se pudo validar el token de Microsoft")
+    except Exception:
+        print(traceback.format_exc())
+        raise get_internal_server_error_exception(
+            "Ocurrio un error inesperado al validar el token de Microsoft"
         )
 
 
