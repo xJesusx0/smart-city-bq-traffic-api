@@ -1,7 +1,6 @@
-from app.auth.models.oauth import MicrosoftUserInfo
 import traceback
 
-from app.auth.models.oauth import GoogleUserInfo
+from app.auth.models.oauth import GoogleUserInfo, MicrosoftUserInfo
 from app.core.models.user import DbUser
 from app.core.repositories.user_repository import UserRepository
 from app.core.security.encryption_service import encrypt, verify
@@ -15,7 +14,10 @@ class AuthService:
         user = self.user_repository.get_user_by_email(username)
         if not user or not user.active:
             return None
-        print(user)
+
+        if user.external_login:
+            return None
+
         if not user.password or not user.password.strip():
             return None
 
@@ -38,7 +40,9 @@ class AuthService:
             print(traceback.format_exc())
             return None
 
-    def authenticate_microsoft_user(self, microsoft_user_info: MicrosoftUserInfo) -> DbUser | None:
+    def authenticate_microsoft_user(
+        self, microsoft_user_info: MicrosoftUserInfo
+    ) -> DbUser | None:
         try:
             if not microsoft_user_info.email:
                 return None
@@ -48,18 +52,12 @@ class AuthService:
             print(traceback.format_exc())
             return None
 
-    def _authenticate_with_email(self, email:str) -> DbUser | None:
+    def _authenticate_with_email(self, email: str) -> DbUser | None:
         if not email:
             return None
 
         user = self.user_repository.get_user_by_email(email)
         if not user or not user.active:
-            return None
-        print(user)
-        if not user.password or not user.password.strip():
-            return None
-
-        if user.must_change_password:
             return None
 
         return user

@@ -11,6 +11,7 @@ class GoogleUserInfo(BaseModel):
     picture: str | None
     sub: str | None
 
+
 class MicrosoftUserInfo(BaseModel):
     email: str | None
     name: str | None

@@ -1,9 +1,8 @@
-from sqlalchemy import try_cast
-from app.core.dependencies import MicrosoftAuthServiceDep
 import logging
 import traceback
 from typing import Annotated, Optional
 
+import jwt
 from fastapi import HTTPException, status
 from fastapi.params import Depends
 from fastapi.routing import APIRouter
@@ -17,6 +16,7 @@ from app.core.dependencies import (
     CurrentUserDep,
     GetModulesWithUseCaseDep,
     GoogleAuthServiceDep,
+    MicrosoftAuthServiceDep,
 )
 from app.core.exceptions import (
     get_bad_request_exception,
@@ -52,10 +52,10 @@ def oauth_google_login(
     google_auth_service: GoogleAuthServiceDep,
 ) -> Token:
     try:
-        print("Validando token de Google...")
+        logging.info("Validando token de Google...")
         google_user_info = google_auth_service.get_user_info(token_request.token)
 
-        print("Token de Google validado:", google_user_info)
+        logging.info(f"Token de Google validado: {google_user_info.email}")
         if google_user_info is None:
             raise get_credentials_exception("Token de google inválido")
 
@@ -63,11 +63,13 @@ def oauth_google_login(
 
         return validate_and_create_token(user)
 
+    except HTTPException as e:
+        raise e
     except ValueError:
-        print(traceback.format_exc())
+        logging.error(traceback.format_exc())
         raise get_credentials_exception("No se pudo validar el token de Google")
-    except Exception:
-        print(traceback.format_exc())
+    except Exception as e:
+        logging.error(f"Error inesperado al validar token de google: {e}")
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado al validar el token de Google"
         )
@@ -77,13 +79,13 @@ def oauth_google_login(
 def oauth_microsoft_login(
     token_request: OauthTokenRequest,
     auth_service: AuthServiceDep,
-    microsoft_auth_service: MicrosoftAuthServiceDep
+    microsoft_auth_service: MicrosoftAuthServiceDep,
 ) -> Token:
     try:
-        print("Validando token de Microsoft...")
+        logging.info("Validando token de Microsoft...")
         microsoft_user_info = microsoft_auth_service.get_user_info(token_request.token)
 
-        print("Token de Microsoft validado:", microsoft_user_info)
+        logging.info(f"Token de Microsoft validado: {microsoft_user_info.email}")
         if microsoft_user_info is None:
             raise get_credentials_exception("Token de microsoft inválido")
 
@@ -91,11 +93,13 @@ def oauth_microsoft_login(
 
         return validate_and_create_token(user)
 
-    except ValueError:
-        print(traceback.format_exc())
-        raise get_credentials_exception("No se pudo validar el token de Microsoft")
-    except Exception:
-        print(traceback.format_exc())
+    except HTTPException as e:
+        raise e
+    except jwt.PyJWTError as e:
+        logging.error(f"Error de validacion de token JWT Microsoft: {e}")
+        raise get_credentials_exception("Token de Microsoft inválido o expirado")
+    except Exception as e:
+        logging.error(f"Error inesperado al validar token de microsoft: {e}")
         raise get_internal_server_error_exception(
             "Ocurrio un error inesperado al validar el token de Microsoft"
         )
