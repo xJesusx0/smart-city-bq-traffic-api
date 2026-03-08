@@ -71,7 +71,7 @@ async def create_user(
                 token=new_user.update_password_uuid,
             )
 
-        return user
+        return new_user
     except IntegrityError:
         print(traceback.print_exc())
         raise get_conflict_exception(

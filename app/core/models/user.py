@@ -31,6 +31,7 @@ class UserUpdate(SQLModel):
     name: Optional[str] = None
     active: Optional[bool] = None
     roles: Optional[list[int]] = None
+    external_login: Optional[bool] = None
 
 
 class DbUser(UserBase, table=True):
