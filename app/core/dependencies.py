@@ -47,7 +47,6 @@ from app.iam.usecases.get_user_with_modules import GetUserWithModulesUseCase
 from app.iam.usecases.get_users_with_roles import GetUsersWithRolesUseCase
 from app.iam.usecases.update_role import UpdateRoleUseCase
 from app.iam.usecases.update_user import UpdateUserUseCase
-from app.traffic.services.location_service import LocationService
 
 JWT_SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
@@ -138,10 +137,6 @@ def get_module_role_service(
     return ModuleRoleService(module_role_repository=module_role_repository)
 
 
-def get_location_service(location_repository: LocationRepoDep) -> LocationService:
-    return LocationService(location_repository=location_repository)
-
-
 def get_email_service() -> EmailService:
     return EmailService(ConnectionConfig(**email_settings.model_dump()))
 
@@ -159,7 +154,6 @@ ModuleServiceDep = Annotated[ModuleService, Depends(get_module_service)]
 RoleServiceDep = Annotated[RoleService, Depends(get_role_service)]
 UserRoleServiceDep = Annotated[UserRoleService, Depends(get_user_role_service)]
 ModuleRoleServiceDep = Annotated[ModuleRoleService, Depends(get_module_role_service)]
-LocationServiceDep = Annotated[LocationService, Depends(get_location_service)]
 GoogleAuthServiceDep = Annotated[GoogleAuthService, Depends(get_google_auth_service)]
 MicrosoftAuthServiceDep = Annotated[
     MicrosoftAuthService, Depends(get_microsoft_auth_service)
