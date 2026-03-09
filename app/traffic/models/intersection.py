@@ -1,6 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel
+
 from app.geo.models.geo_info_service_models import Intersection
 
 
@@ -31,6 +32,7 @@ class IntersectionHeartbeat(BaseModel):
 class IntersectionState(IntersectionHeartbeat):
     intersection_id: int
     last_seen: int
+
 
 class IntersectionWithStatus(Intersection):
     realtime_data: IntersectionState | None = None
