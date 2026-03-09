@@ -67,7 +67,7 @@ class GeoInfoService:
     async def get_intersection_by_point(
         self, latitude: float, longitude: float, radius: int
     ) -> list[Intersection]:
-        url = f"{self.base_url}/api/v1/intersections?latitude={latitude}&longitude={longitude}&radius={radius}&limit=10"
+        url = f"{self.base_url}/api/v1/intersections/coordinates?latitude={latitude}&longitude={longitude}&radius={radius}&limit=10"
         response = await self.send_request(url)
         if response.status_code == 200:
             data: list = response.json()
@@ -118,6 +118,15 @@ class GeoInfoService:
         if response.status_code == 200 or response.status_code == 201:
             data: dict = response.json()
             return Intersection(**data)
+        else:
+            self._handle_error_response(response)
+
+    async def get_intersections(self) -> list[Intersection]:
+        url = f"{self.base_url}/api/v1/intersections"
+        response = await self.send_request(url)
+        if response.status_code == 200:
+            data: list = response.json()
+            return [Intersection(**item) for item in data]
         else:
             self._handle_error_response(response)
 
