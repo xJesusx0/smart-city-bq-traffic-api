@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiration_time: int = 1  # tiempo en dias
     db_url: str = ""
+    redis_url: str = "redis://localhost:6379/0"
 
     allowed_hosts: list[str] = []
 
