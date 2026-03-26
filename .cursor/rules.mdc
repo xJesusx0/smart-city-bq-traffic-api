@@ -40,7 +40,6 @@ app/
 ├── domains/  
 │ ├── auth/ # Login, tokens, OAuth  
 │ ├── iam/ # Users, roles, permissions  
-│ ├── charts/ # Analytics, metrics, MongoDB access  
 │ ├── traffic/ # Cameras, locations, devices, semaphores  
 │ └── **init**.py  
 ├── db/ # SQLAlchemy engine, Base, Alembic migrations  

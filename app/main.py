@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.routes.auth import auth_router
-from app.charts.routes.charts import charts_router
 from app.core.dependencies import validate_token
 from app.core.settings import settings
 from app.geo.routes.geo import geo_router, public_geo_router
@@ -33,7 +32,6 @@ app.include_router(auth_router)
 app.include_router(user_router, dependencies=[Depends(validate_token)])
 app.include_router(role_router, dependencies=[Depends(validate_token)])
 app.include_router(module_router, dependencies=[Depends(validate_token)])
-app.include_router(charts_router, dependencies=[Depends(validate_token)])
 app.include_router(public_geo_router)
 app.include_router(geo_router, dependencies=[Depends(validate_token)])
 

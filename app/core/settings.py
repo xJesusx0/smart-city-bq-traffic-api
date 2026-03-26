@@ -26,10 +26,6 @@ class Settings(BaseSettings):
 
     allowed_hosts: list[str] = []
 
-    mongodb_url: str = "mongodb://admin:admin123@localhost:27017"
-    mongodb_database: str = "smart_traffic"
-    mongodb_collection: str = "traffic_metrics"
-
     google_client_id: str = ""
 
     mail_username: str = ""
